@@ -11,8 +11,16 @@
 </template>
 
 <script>
-export default {
+import { mapState, mapActions } from 'pinia'
+import { useUsersStore } from '@/stores/users'
 
+export default {
+  methods: {
+    ...mapActions(useUsersStore, ['checkLoggedIn']),
+  },
+  created() {
+    this.checkLoggedIn()
+  }
 }
 </script>
 

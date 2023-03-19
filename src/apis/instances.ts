@@ -1,9 +1,6 @@
 import axios, { InternalAxiosRequestConfig } from "axios";
 
-import { useUsersStore } from "../stores/users";
 import { baseUrl } from '../utils'
-
-const userStore = useUsersStore()
 
 const api = axios.create({
   baseURL: baseUrl,
@@ -14,7 +11,8 @@ const authApi = axios.create({
 })
 
 const onFulfilled = (config: InternalAxiosRequestConfig) => {
-  const secretToken = userStore.accessToken
+  const accessToken = localStorage.getItem('access-token')
+  config.headers.Authorization = accessToken ? `Bearer ${accessToken}` : ''
   return config
 }
 authApi.interceptors.request.use(onFulfilled)

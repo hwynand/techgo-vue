@@ -26,6 +26,11 @@ const router = createRouter({
       path: '/san-pham/:slug',
       name: 'detail-product',
       component: () => import('../views/products/ProductDetailView.vue')
+    },
+    {
+      path: '/dang-nhap',
+      name: 'login',
+      component: () => import('../views/users/LoginView.vue')
     }
   ]
 })
