@@ -57,6 +57,7 @@
   margin: 0;
   position: relative;
   font-weight: normal;
+  padding: 0;
 }
 
 body {
@@ -71,4 +72,8 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.fa-solid {
+  font-family: 'FontAwesome';
 }
