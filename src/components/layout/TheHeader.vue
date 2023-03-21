@@ -180,9 +180,9 @@
 <script>
 import { api } from '../../api';
 import { items, item_title, listElectric, listMacbook, listCategory } from '../../share/Data.js';
-import ListTechGo from './the_header-items/List-techgo.vue';
-import ListElectric from './the_header-items/List-electric.vue';
-import ListMacbook from './the_header-items/List-macbook.vue';
+import ListTechGo from './the_header-items/ListTechgo.vue';
+import ListElectric from './the_header-items/ListElectric.vue';
+import ListMacbook from './the_header-items/ListMacbook.vue';
 
 export default {
   components: {
@@ -613,6 +613,7 @@ a {
   display: flex;
   align-items: center;
   width: 100%;
+  background-color: white;
 }
 
 .content-left {

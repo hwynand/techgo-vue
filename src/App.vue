@@ -5,8 +5,14 @@ import DefaultLayout from './layouts/DefaultLayout.vue';
 
 <template>
   <default-layout>
-    <RouterView />
+    <div class="main-view">
+      <RouterView />
+    </div>
   </default-layout>
 </template>
 
-<style scoped></style>
+<style scoped>
+.main-view {
+  padding-top: 75px;
+}
+</style>
