@@ -48,7 +48,7 @@
               </div>
             </button>
           </div>
-          <div class="header-right-account" v-if="showUser">
+          <div class="header-right-account" v-if="!auth.isLoggedIn">
             <button class="header-right-account-btn">
               <span><i class="fa-regular fa-circle-user"></i></span>
               <span class="header-right-span">
@@ -65,7 +65,7 @@
                 <span>
                   <router-link to="/User">
                     Tài khoản của <i class="fa-solid fa-chevron-down "></i>
-                    <p class="text-user">{{ userName.firstname }} {{ userName.lastname }}</p>
+                    <p class="text-user">{{ auth.user.firstname }} {{ auth.user.lastname }}</p>
                   </router-link>
                 </span>
               </span>
@@ -178,6 +178,9 @@
   </div>
 </template>
 <script>
+import { mapState, mapActions } from 'pinia'
+import { useUsersStore } from '@/stores/users'
+
 // import { api } from '../../api';
 import { items, item_title, listElectric, listMacbook, listCategory } from '../share/Data.js';
 import ListTechgo from './TheHeaderListTechgo.vue';
@@ -197,7 +200,6 @@ export default {
       searchItems: ['điện thoại', 'pc-máy tính đồng bộ', 'laptop & macbook', 'đồng hồ thông minh', 'linh kiện máy tính'],
       numberCart: 0,
       showUser: true,
-      userName: {},
       searchProduct: '',
 
       showList: false,
@@ -214,6 +216,7 @@ export default {
     }
   },
   methods: {
+    // ...mapActions(useUsersStore, ['logout']),
     reload() {
       location.reload();
     },
@@ -279,15 +282,12 @@ export default {
 
   },
 
+  computed: {
+    ...mapState(useUsersStore, ['auth'])
+  },
+
   async created() {
-    // const token = localStorage.getItem('access_token');
-    // console.log(token);
-    // const res = await api.getProfile(token);
-    // if (res.status == 200) {
-    //   this.userName = res.data;
-    //   this.showUser = false
-    //   console.log(this.userName);
-    // }
+    
 
   },
 

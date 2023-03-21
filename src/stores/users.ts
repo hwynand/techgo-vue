@@ -51,7 +51,6 @@ export const useUsersStore = defineStore('users', {
       return res
     },
     checkLoggedIn() {
-      console.log('checking')
       const isLoggedIn = localStorage.getItem('isLoggedIn')
       const userData = localStorage.getItem('user')
       if (isLoggedIn && userData) {
