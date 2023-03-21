@@ -10,7 +10,7 @@
         <!-- ---------------------------search------------------------------------- -->
 
         <div class="header-center">
-          <div class="Search" v-click-outside="onClickOutside">
+          <div class="Search" v-click-outside="onClickOutsideSearch">
             <input @click="onClickSearch" type="text" placeholder="Tìm kiếm sản phẩm..." v-model="searchProduct">
             <div class="header-center-button">
               <button><i class="fa-sharp fa-solid fa-magnifying-glass"></i></button>
@@ -52,7 +52,8 @@
             <button class="header-right-account-btn">
               <span><i class="fa-regular fa-circle-user"></i></span>
               <span class="header-right-span">
-                <span><router-link to="/SignIn">Đăng nhập / Đăng ký</router-link></span>
+                <!-- <span><router-link to="/SignIn">Đăng nhập / Đăng ký</router-link></span> -->
+                <span>Đăng nhập / Đăng ký</span>
               </span>
             </button>
           </div>
@@ -83,7 +84,7 @@
             </div>
           </div>
           <div class="header-right-cart">
-            <router-link to="/cart">
+            <!-- <router-link to="*">
               <button class="header-right-cart-btn">
                 <span><i class="fa-solid fa-cart-shopping"></i></span>
                 <span class="header-right-span">
@@ -91,11 +92,20 @@
                   <span class="coutCart">{{ this.numberCart }}</span>
                 </span>
               </button>
-            </router-link>
+            </router-link> -->
+            <button class="header-right-cart-btn">
+              <span><i class="fa-solid fa-cart-shopping"></i></span>
+              <span class="header-right-span">
+                <span>Giỏ hàng</span>
+                <span class="coutCart">{{ this.numberCart }}</span>
+              </span>
+            </button>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- ---------------------------------------------------------------- -->
     <div class="home-content">
       <div class="content-left" v-click-outside="onClickOutside">
         <v-btn @click="showLists">
@@ -170,8 +180,17 @@
 <script>
 import { api } from '../../api';
 import { items, item_title, listElectric, listMacbook, listCategory } from '../../share/Data.js';
+import ListTechGo from './the_header-items/List-techgo.vue';
+import ListElectric from './the_header-items/List-electric.vue';
+import ListMacbook from './the_header-items/List-macbook.vue';
 
 export default {
+  components: {
+    ListTechGo,
+    ListElectric,
+    ListMacbook
+  },
+
   data() {
     return {
       showSearches: false,
@@ -181,7 +200,7 @@ export default {
       userName: {},
       searchProduct: '',
 
-      showList: false,
+      showList: true,
       isShowHomeList: false,
       isShowListElectric: false,
       isShowListMacbook: false,
@@ -204,7 +223,7 @@ export default {
       this.showSearches = !this.showSearches;
     },
 
-    onClickOutside() {
+    onClickOutsideSearch() {
       this.showSearches = false;
     },
 
@@ -222,10 +241,9 @@ export default {
 
     showLists() {
       this.showList = !this.showList;
-      // this.isShowHomeList = false;
-      // this.isShowListElectric = false;
-      // this.isShowListMacbook = false;
-      console.log(11);
+      this.isShowHomeList = false;
+      this.isShowListElectric = false;
+      this.isShowListMacbook = false;
     },
 
     handleClickTechGo() {
@@ -262,14 +280,14 @@ export default {
   },
 
   async created() {
-    const token = localStorage.getItem('access_token');
-    console.log(token);
-    const res = await api.getProfile(token);
-    if (res.status == 200) {
-      this.userName = res.data;
-      this.showUser = false
-      console.log(this.userName);
-    }
+    // const token = localStorage.getItem('access_token');
+    // console.log(token);
+    // const res = await api.getProfile(token);
+    // if (res.status == 200) {
+    //   this.userName = res.data;
+    //   this.showUser = false
+    //   console.log(this.userName);
+    // }
 
   },
 
@@ -327,7 +345,7 @@ export default {
   /* text-align: center; */
 }
 
-.header-left h3:hover {
+header-center .header-left h3:hover {
   cursor: pointer;
   transition: color 300ms ease;
   color: #95afc0;
@@ -350,16 +368,16 @@ export default {
 
 .header-center input:focus {
   outline: 1px solid #f1c40f;
-  border: 1px solid #f1c40f;
+  /* border: 1px solid #f1c40f; */
 }
 
 .header-center-button {
   position: absolute;
   right: 10%;
-  bottom: 3%;
+  bottom: 0;
   color: white;
   background-color: #f39c12;
-  padding: 1px 8px;
+  padding: 2px 8px;
   border-radius: 30%;
 }
 
@@ -461,7 +479,7 @@ export default {
 }
 
 .Search {
-  margin-top: 7px;
+  margin-top: 13px;
   position: relative;
 }
 
@@ -595,9 +613,11 @@ a {
 
 .home-content {
   padding: 0 56px;
-  padding-top: 48px;
+  padding-top: 52px;
   display: flex;
   align-items: center;
+  position: fixed;
+  z-index: 1;
 }
 
 .content-left {
@@ -630,7 +650,7 @@ a {
 
 .content-left-items li {
   padding: 6px 16px;
-  width: 234px;
+  width: 230px;
   font-size: 14px;
   color: #3d3d3d;
 }
@@ -668,13 +688,6 @@ a {
 .content-left-items li a:hover {
   color: black;
   transition: 0.3s linear;
-}
-
-.content-left-items li {
-  padding: 6px 16px;
-  width: 234px;
-  font-size: 14px;
-  color: #3d3d3d;
 }
 
 .content-left-items li a {
