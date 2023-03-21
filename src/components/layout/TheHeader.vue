@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="header-fixed">
     <div class="body-header">
       <div class="header">
         <div class="header-left">
@@ -200,7 +200,7 @@ export default {
       userName: {},
       searchProduct: '',
 
-      showList: true,
+      showList: false,
       isShowHomeList: false,
       isShowListElectric: false,
       isShowListMacbook: false,
@@ -297,9 +297,6 @@ export default {
 <style scoped>
 .body-header {
   background-color: #2c3e50;
-  position: fixed;
-  width: 100%;
-  z-index: 1;
 }
 
 .header {
@@ -345,7 +342,7 @@ export default {
   /* text-align: center; */
 }
 
-header-center .header-left h3:hover {
+.header-left h3:hover {
   cursor: pointer;
   transition: color 300ms ease;
   color: #95afc0;
@@ -613,11 +610,9 @@ a {
 
 .home-content {
   padding: 0 56px;
-  padding-top: 52px;
   display: flex;
   align-items: center;
-  position: fixed;
-  z-index: 1;
+  width: 100%;
 }
 
 .content-left {
@@ -777,5 +772,11 @@ a {
 
 .items-plus {
   list-style: none;
+}
+
+.header-fixed {
+  position: fixed;
+  width: 100%;
+  z-index: 1;
 }
 </style>
