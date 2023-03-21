@@ -52,8 +52,7 @@
             <button class="header-right-account-btn">
               <span><i class="fa-regular fa-circle-user"></i></span>
               <span class="header-right-span">
-                <!-- <span><router-link to="/SignIn">Đăng nhập / Đăng ký</router-link></span> -->
-                <span>Đăng nhập / Đăng ký</span>
+                <span><router-link to="/dang-nhap">Đăng nhập / Đăng ký</router-link></span>
               </span>
             </button>
           </div>
