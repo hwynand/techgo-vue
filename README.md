@@ -27,3 +27,10 @@ npm run dev
 ```sh
 npm run build
 ```
+
+main -> feature -> develop -> staging -> main
+develop -> fixbug -> develop
+staging ->  fixbug -> develop -> staging
+
+
+3 branches: main, staging, develop, fixbug
