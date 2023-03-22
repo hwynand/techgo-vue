@@ -101,8 +101,76 @@
       <div class="top-products">
         <div class="products-box">
           <div class="products-items">
-            <h3>Top sản phẩm bán chạy</h3>
-            <Swiper></Swiper>
+            <h2>Top sản phẩm bán chạy</h2>
+            <div class="slide-group">
+              <v-sheet class="mx-auto" elevation="8" max-width="100%">
+                <v-slide-group v-model="model" class="pa-4" center-active show-arrows>
+                  <v-slide-group-item v-for="(products, i) in data" :key="i" v-slot="{ isSelected, toggle }">
+                    <v-card class="ma-4" width="228" @click="toggle">
+                      <ProductCardVue :url="products.product_variants[0].images[0].image_path" :name="products.name"
+                        :brand="products.brand.name">
+                      </ProductCardVue>
+                    </v-card>
+                  </v-slide-group-item>
+                </v-slide-group>
+              </v-sheet>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- --------------------------------------------------------------- -->
+      <div class="top-products-sale">
+        <div class="products-box-sale">
+          <div class="products-items">
+            <div class="top-sale">
+              <h2>Top sản phẩm khuyến mại </h2>
+              <div class="time-sale">
+                <div class="time_products-sale">
+                  <p>{{ timeDays }}</p>
+                  <p class="time-sale-text">Days</p>
+                </div>
+                <div class="time_products-sale">
+                  <p>{{ timesHours }}</p>
+                  <p class="time-sale-text">Hours</p>
+                </div>
+                <div class="time_products-sale">
+                  <p>{{ minutes }}</p>
+                  <p class="time-sale-text">minutes</p>
+                </div>
+                <div class="time_products-sale">
+                  <p>{{ seconds }}</p>
+                  <p class="time-sale-text">seconds</p>
+                </div>
+              </div>
+              <div class="container">
+                <div class="header-right-address-Ripple">
+                  <span style="--i:1 "></span>
+                  <span style="--i:2 "></span>
+                  <span style="--i:3 "></span>
+                </div>
+              </div>
+            </div>
+            <div class="slide-group slide-group-sale">
+              <v-sheet class="mx-auto" elevation="8" max-width="100%">
+                <v-slide-group v-model="model" class="pa-4" center-active show-arrows>
+                  <v-slide-group-item v-for="(products, i) in data" :key="i" v-slot="{ isSelected, toggle }">
+                    <v-card class="ma-4" width="220" @click="toggle">
+                      <ProductCardVue :url="products.product_variants[0].images[0].image_path" :name="products.name"
+                        :brand="products.brand.name">
+                      </ProductCardVue>
+                    </v-card>
+                  </v-slide-group-item>
+                </v-slide-group>
+              </v-sheet>
+            </div>
+            <div class="wrapper">
+              <a href="#0" class="btn_add-cart">
+                <span class="add-cards">Xem tất cả sản phẩm khuyến mãi</span>
+                <span class="cart_span"><i class="fa-solid fa-angles-right"></i></span>
+                <div class="transition"></div>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -337,7 +405,25 @@ export default {
   color: white;
 }
 
-.v-btn .v-btn--density-default {
-  width: 243px;
+.slide-group-sale {
+  padding-left: 0;
+}
+
+
+
+@keyframes animate {
+  0% {
+    width: 0;
+    height: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    width: 30px;
+    height: 30px;
+  }
 }
 </style>
