@@ -1,0 +1,1 @@
+export const baseUrl = 'https://pxh09.cloud/api/'
