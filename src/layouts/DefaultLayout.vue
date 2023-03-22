@@ -13,8 +13,8 @@
 </template>
 
 <script>
-import TheFooter from '../components/layout/TheFooter.vue';
-import TheHeader from '../components/layout/TheHeader.vue';
+import TheFooter from '../components/TheFooter.vue';
+import TheHeader from '../components/TheHeader.vue';
 import BaseLayout from "./BaseLayout.vue";
 export default {
   components: { BaseLayout, TheHeader, TheFooter },

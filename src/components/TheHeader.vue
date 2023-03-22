@@ -48,12 +48,11 @@
               </div>
             </button>
           </div>
-          <div class="header-right-account" v-if="showUser">
+          <div class="header-right-account" v-if="!auth.isLoggedIn">
             <button class="header-right-account-btn">
               <span><i class="fa-regular fa-circle-user"></i></span>
               <span class="header-right-span">
-                <!-- <span><router-link to="/SignIn">Đăng nhập / Đăng ký</router-link></span> -->
-                <span>Đăng nhập / Đăng ký</span>
+                <span><router-link to="/dang-nhap">Đăng nhập / Đăng ký</router-link></span>
               </span>
             </button>
           </div>
@@ -65,7 +64,7 @@
                 <span>
                   <router-link to="/User">
                     Tài khoản của <i class="fa-solid fa-chevron-down "></i>
-                    <p class="text-user">{{ userName.firstname }} {{ userName.lastname }}</p>
+                    <p class="text-user">{{ auth.user.firstname }} {{ auth.user.lastname }}</p>
                   </router-link>
                 </span>
               </span>
@@ -84,7 +83,7 @@
             </div>
           </div>
           <div class="header-right-cart">
-            <!-- <router-link to="*">
+            <router-link to="*">
               <button class="header-right-cart-btn">
                 <span><i class="fa-solid fa-cart-shopping"></i></span>
                 <span class="header-right-span">
@@ -92,14 +91,7 @@
                   <span class="coutCart">{{ this.numberCart }}</span>
                 </span>
               </button>
-            </router-link> -->
-            <button class="header-right-cart-btn">
-              <span><i class="fa-solid fa-cart-shopping"></i></span>
-              <span class="header-right-span">
-                <span>Giỏ hàng</span>
-                <span class="coutCart">{{ this.numberCart }}</span>
-              </span>
-            </button>
+            </router-link>
           </div>
         </div>
       </div>
@@ -136,9 +128,9 @@
                 limit_by === 9 ? '+ Hiện Thêm' : '- Ẩn Bớt' }}</li>
             </ul>
           </div>
-          <!-- -------------------------ListTechGo--------------------------------------- -->
+          <!-- -------------------------ListTechgo--------------------------------------- -->
           <div v-if="isShowHomeList" class="content-home-list">
-            <ListTechGo :item_title="item_title"></ListTechGo>
+            <ListTechgo :item_title="item_title"></ListTechgo>
           </div>
 
           <!-- ---------------------------ListElectric------------------------------------- -->
@@ -186,7 +178,7 @@ import ListMacbook from './the_header-items/ListMacbook.vue';
 
 export default {
   components: {
-    ListTechGo,
+    ListTechgo,
     ListElectric,
     ListMacbook
   },
@@ -197,7 +189,6 @@ export default {
       searchItems: ['điện thoại', 'pc-máy tính đồng bộ', 'laptop & macbook', 'đồng hồ thông minh', 'linh kiện máy tính'],
       numberCart: 0,
       showUser: true,
-      userName: {},
       searchProduct: '',
 
       showList: false,
@@ -214,6 +205,7 @@ export default {
     }
   },
   methods: {
+    // ...mapActions(useUsersStore, ['logout']),
     reload() {
       location.reload();
     },
@@ -279,15 +271,12 @@ export default {
 
   },
 
+  computed: {
+    ...mapState(useUsersStore, ['auth'])
+  },
+
   async created() {
-    // const token = localStorage.getItem('access_token');
-    // console.log(token);
-    // const res = await api.getProfile(token);
-    // if (res.status == 200) {
-    //   this.userName = res.data;
-    //   this.showUser = false
-    //   console.log(this.userName);
-    // }
+
 
   },
 
@@ -312,7 +301,7 @@ export default {
   top: 104%;
   width: 90%;
   margin-bottom: 16px;
-  z-index: 1;
+  z-index: 11;
   border-radius: 12px;
 }
 
@@ -488,7 +477,7 @@ export default {
   width: 217px;
   left: -8%;
   display: none;
-
+  z-index: 1;
 }
 
 .header-right-address-hover p {
@@ -714,6 +703,7 @@ a {
   display: flex;
   text-align: center;
   font-size: 0.8em;
+  z-index: 10;
 }
 
 .content-center-li img {
@@ -778,6 +768,6 @@ a {
 .header-fixed {
   position: fixed;
   width: 100%;
-  z-index: 1;
+  z-index: 2;
 }
 </style>

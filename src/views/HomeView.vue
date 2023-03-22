@@ -389,7 +389,6 @@ export default {
 
 :deep(.v-window--show-arrows-on-hover:hover .v-window__left) {
   background-color: #2C3A47;
-
 }
 
 :deep(.v-window--show-arrows-on-hover:hover .v-window__right) {
