@@ -26,19 +26,19 @@ export const listMacbook = [
 
 
 export const listCategory = [
-    { title: 'điện thoại', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_1_img.jpg?v=2257' },
-    { title: 'laptop', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_2_img.jpg?v=2257' },
-    { title: 'tablet', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_3_img.jpg?v=2257' },
-    { title: 'đồng hồ thông minh', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_4_img.jpg?v=2257' },
-    { title: 'ốp lưng điện thoại', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_5_img.jpg?v=2257' },
-    { title: 'chuột máy tính', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_6_img.jpg?v=2257' },
-    { title: 'màn hình máy tính', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_7_img.jpg?v=2257' },
-    { title: 'loa blutooth', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_8_img.jpg?v=2257' },
-    { title: 'tai nghe', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_9_img.jpg?v=2257' },
-    { title: 'sạc dự phòng', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_10_img.jpg?v=2257' },
-    { title: 'thiết bị mảng', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_11_img.jpg?v=2257' },
-    { title: 'bàn phím máy tính', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_12_img.jpg?v=2257' },
-    { title: 'cáp sạc', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_13_img.jpg?v=2257' },
-    { title: 'máy in', thumb: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_14_img.jpg?v=2257' },
+    { title: 'điện thoại', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_1_img.jpg?v=2257' },
+    { title: 'laptop', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_2_img.jpg?v=2257' },
+    { title: 'tablet', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_3_img.jpg?v=2257' },
+    { title: 'đồng hồ thông minh', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_4_img.jpg?v=2257' },
+    { title: 'ốp lưng điện thoại', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_5_img.jpg?v=2257' },
+    { title: 'chuột máy tính', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_6_img.jpg?v=2257' },
+    { title: 'màn hình máy tính', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_7_img.jpg?v=2257' },
+    { title: 'loa blutooth', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_8_img.jpg?v=2257' },
+    { title: 'tai nghe', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_9_img.jpg?v=2257' },
+    { title: 'sạc dự phòng', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_10_img.jpg?v=2257' },
+    { title: 'thiết bị mảng', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_11_img.jpg?v=2257' },
+    { title: 'bàn phím máy tính', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_12_img.jpg?v=2257' },
+    { title: 'cáp sạc', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_13_img.jpg?v=2257' },
+    { title: 'máy in', url: 'https://theme.hstatic.net/200000516791/1000880762/14/cate_feature_14_img.jpg?v=2257' },
 ]
 

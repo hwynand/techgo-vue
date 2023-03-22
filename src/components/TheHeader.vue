@@ -83,7 +83,7 @@
             </div>
           </div>
           <div class="header-right-cart">
-            <!-- <router-link to="*">
+            <router-link to="*">
               <button class="header-right-cart-btn">
                 <span><i class="fa-solid fa-cart-shopping"></i></span>
                 <span class="header-right-span">
@@ -91,14 +91,7 @@
                   <span class="coutCart">{{ this.numberCart }}</span>
                 </span>
               </button>
-            </router-link> -->
-            <button class="header-right-cart-btn">
-              <span><i class="fa-solid fa-cart-shopping"></i></span>
-              <span class="header-right-span">
-                <span>Giỏ hàng</span>
-                <span class="coutCart">{{ this.numberCart }}</span>
-              </span>
-            </button>
+            </router-link>
           </div>
         </div>
       </div>
@@ -286,7 +279,7 @@ export default {
   },
 
   async created() {
-    
+
 
   },
 
@@ -311,7 +304,7 @@ export default {
   top: 104%;
   width: 90%;
   margin-bottom: 16px;
-  z-index: 1;
+  z-index: 11;
   border-radius: 12px;
 }
 
@@ -487,7 +480,7 @@ export default {
   width: 217px;
   left: -8%;
   display: none;
-
+  z-index: 1;
 }
 
 .header-right-address-hover p {
@@ -612,6 +605,7 @@ a {
   display: flex;
   align-items: center;
   width: 100%;
+  background-color: white;
 }
 
 .content-left {
@@ -712,6 +706,7 @@ a {
   display: flex;
   text-align: center;
   font-size: 0.8em;
+  z-index: 10;
 }
 
 .content-center-li img {
@@ -776,6 +771,6 @@ a {
 .header-fixed {
   position: fixed;
   width: 100%;
-  z-index: 1;
+  z-index: 2;
 }
 </style>

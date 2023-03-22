@@ -31,6 +31,11 @@ const router = createRouter({
       path: '/dang-nhap',
       name: 'login',
       component: () => import('../views/users/LoginView.vue')
+    },
+    {
+      path: '/productcard',
+      name: 'productcard',
+      component: () => import('../components/ProductCard.vue')
     }
   ]
 })
