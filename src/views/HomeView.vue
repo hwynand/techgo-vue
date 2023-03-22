@@ -408,6 +408,10 @@ export default {
   padding-left: 0;
 }
 
+.slide-group-sale {
+  padding-left: 0;
+}
+
 
 
 @keyframes animate {

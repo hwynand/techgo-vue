@@ -170,11 +170,14 @@
   </div>
 </template>
 <script>
-import { api } from '../../api';
-import { items, item_title, listElectric, listMacbook, listCategory } from '../../share/Data.js';
-import ListTechGo from './the_header-items/ListTechgo.vue';
-import ListElectric from './the_header-items/ListElectric.vue';
-import ListMacbook from './the_header-items/ListMacbook.vue';
+import { mapState, mapActions } from 'pinia'
+import { useUsersStore } from '@/stores/users'
+
+// import { api } from '../../api';
+import { items, item_title, listElectric, listMacbook, listCategory } from '../share/Data.js';
+import ListTechgo from './TheHeaderListTechgo.vue';
+import ListElectric from './TheHeaderListElectric.vue';
+import ListMacbook from './TheHeaderListMacbook.vue';
 
 export default {
   components: {
