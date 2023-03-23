@@ -11,7 +11,7 @@
 
         <div class="header-center">
           <div class="Search" v-click-outside="onClickOutsideSearch">
-            <input @click="onClickSearch" type="text" placeholder="Tìm kiếm sản phẩm..." v-model="searchProduct">
+            <input @change="onClickSearch" type="text" placeholder="Tìm kiếm sản phẩm..." v-model="searchProduct">
             <div class="header-center-button">
               <button><i class="fa-sharp fa-solid fa-magnifying-glass"></i></button>
             </div>
@@ -214,8 +214,14 @@ export default {
     },
 
 
-    onClickSearch() {
-      this.showSearches = !this.showSearches;
+    async onClickSearch() {
+      try {
+
+        this.showSearches = !this.showSearches;
+      } catch (error) {
+        console.log(error);
+      }
+
     },
 
     onClickOutsideSearch() {

@@ -68,9 +68,9 @@ export default {
 </script>
 
 <style scoped>
-.product-card {
+/* .product-card {
     height: 100%;
-}
+} */
 
 .details {
     font-size: 1rem;
@@ -112,7 +112,7 @@ export default {
 .card--1 .card__img--hover img {
     padding: 4px;
     width: 100%;
-    object-fit: cover;
+    object-fit: contain;
     height: 100%;
     transition: all .4s cubic-bezier(0.175, 0.885, 0, 1);
     border-radius: 8px;

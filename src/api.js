@@ -25,8 +25,8 @@ export const api = {
     async updateProfile(token, data) {
         return axios.put(`${apiUrl}/users/me`, data, authHeaders(token));
     },
-    async getProducts(token, id, skip, limit, keyWord) {
-        console.log('keyWord', keyWord);
+    async getProducts(token, id, skip, limit) {
+        // console.log('keyWord', keyWord);
         return axios.get(`${apiUrl}/products/${skip || skip == 0 ? (`?skip=${skip}`) : ''}${id ? (`&brand_id=${id}`) : ''}${limit ? (`&limit=${limit}`) : ''} `, authHeaders(token))
     },
 
