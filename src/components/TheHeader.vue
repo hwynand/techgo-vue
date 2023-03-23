@@ -11,7 +11,7 @@
 
         <div class="header-center">
           <div class="Search" v-click-outside="onClickOutsideSearch">
-            <input @change="onClickSearch" type="text" placeholder="Tìm kiếm sản phẩm..." v-model="searchProduct">
+            <input @click="onClickSearch" type="text" placeholder="Tìm kiếm sản phẩm..." v-model="searchProduct">
             <div class="header-center-button">
               <button><i class="fa-sharp fa-solid fa-magnifying-glass"></i></button>
             </div>
@@ -285,8 +285,7 @@ export default {
   },
 
   async created() {
-
-
+    console.log('created');
   },
 
 }
@@ -634,7 +633,7 @@ a {
   color: black;
   cursor: pointer;
   border-left: 3px solid #ffc048;
-  transition: 0.3s linear;
+  transition: 0.1s linear;
 }
 
 .content-left-items li a:hover {
@@ -669,14 +668,6 @@ a {
   height: auto;
   z-index: 1;
 
-}
-
-.content-left-items li:hover {
-  background-color: #f3f5fc;
-  color: black;
-  cursor: pointer;
-  border-left: 3px solid #ffc048;
-  transition: 0.3s linear;
 }
 
 .content-left-items li a:hover {
