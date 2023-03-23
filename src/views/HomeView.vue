@@ -44,7 +44,7 @@
         <div class="products-box">
           <div class="products-items">
             <h2>Top sản phẩm bán chạy</h2>
-            <div class="slide-group">
+            <div class="slide-group ">
               <v-sheet class="mx-auto" elevation="8" max-width="100%">
                 <v-slide-group v-model="model" class="pa-4" center-active show-arrows>
                   <v-slide-group-item v-for="(products, i) in data" :key="i" v-slot="{ isSelected, toggle }">
@@ -93,11 +93,11 @@
                 </div>
               </div>
             </div>
-            <div class="slide-group">
+            <div class="slide-group slide-group-sale">
               <v-sheet class="mx-auto" elevation="8" max-width="100%">
                 <v-slide-group v-model="model" class="pa-4" center-active show-arrows>
                   <v-slide-group-item v-for="(products, i) in data" :key="i" v-slot="{ isSelected, toggle }">
-                    <v-card class="ma-4" width="210" @click="toggle">
+                    <v-card class="ma-4" width="218" @click="toggle">
                       <ProductCardVue :url="products.product_variants[0].images[0].image_path" :name="products.name"
                         :brand="products.brand.name">
                       </ProductCardVue>
@@ -367,6 +367,10 @@ export default {
 .slide-group {
   padding-right: 4px;
   padding-left: 33px;
+}
+
+.slide-group-sale {
+  padding-left: 0 !important;
 }
 
 .top-sale {
