@@ -218,6 +218,8 @@ export default {
   },
 
   computed: {
+
+
     tatalProducs() {
       let tatal = this.products
       return tatal.length

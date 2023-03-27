@@ -163,7 +163,8 @@
 import VueEasyLightbox from 'vue-easy-lightbox/dist/external-css/vue-easy-lightbox.esm.min.js'
 import { api } from '../../api';
 import Swal from 'sweetalert2';
-import { useUsersStore } from '../../stores/users'
+import { mapState, mapActions } from 'pinia'
+import { useUsersStore } from '@/stores/users'
 export default {
   component: {
     VueEasyLightbox,
@@ -222,6 +223,7 @@ export default {
   },
 
   computed: {
+    ...mapActions(useUsersStore, ['checkLoggedIn']),
 
     // getSelectedProduc() {
     //   let index = this.currentIndex;
@@ -287,29 +289,29 @@ export default {
     AddCart() {
       let index = this.currentIndex;
       let inventory = this.detailProduct.product_variants[index].inventory
-      let checkout = this.useUsersStore.checkLoggedIn()
-      console.log('checkout', checkout);
-
-      if (!checkout) {
-
-      }
-
-      if (inventory > 0) {
-        Swal.fire({
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 1500,
-          text: 'Modal with a custom image.',
-          title: this.detailProduct.name,
-          imageUrl: 'https://unsplash.it/400/200',
-          imageWidth: 150,
-          imageHeight: 100,
-          imageAlt: 'Custom image',
-        })
+      const isLoggedIn = localStorage.getItem('isLoggedIn')
+      if (!isLoggedIn) {
+        this.$router.push({ path: '/dang-nhap' })
       } else {
-        Swal.fire('Sản phẩm hết hàng')
+        if (inventory > 0) {
+          Swal.fire({
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1500,
+            text: 'Modal with a custom image.',
+            title: this.detailProduct.name,
+            imageUrl: 'https://unsplash.it/400/200',
+            imageWidth: 150,
+            imageHeight: 100,
+            imageAlt: 'Custom image',
+          })
+        } else {
+          Swal.fire('Sản phẩm hết hàng')
 
+        }
       }
+
+
     },
 
     goToSlideIndex(index) {

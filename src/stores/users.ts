@@ -39,13 +39,14 @@ export const useUsersStore = defineStore('users', {
         localStorage.setItem('access-token', res.data.access_token)
         localStorage.setItem('isLoggedIn', 'true')
         const resProfile = await this.getProfile()
-        this.auth.isLoggedIn = true
+
       }
       return res
     },
     async getProfile() {
       const res = await authApi.get('/users/me')
       if (res.status === 200) {
+        this.auth.isLoggedIn = true
         this.auth.user = res.data
         localStorage.setItem('user', JSON.stringify(this.auth.user))
       }
