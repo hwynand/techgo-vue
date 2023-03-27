@@ -10,6 +10,7 @@ export default {
       password: '',
       wrongEmail: false,
       wrongPw: false,
+      store: useUsersStore(),
     }
   },
   methods: {
@@ -22,7 +23,6 @@ export default {
       } else {
         this.wrongEmail = true;
       }
-      console.log(regex.test(1));
     },
 
     isPasswordValid() {
@@ -35,18 +35,19 @@ export default {
 
     },
 
-    async login() {
+    render() {
+      location.reload();
+    },
+
+    async signIn() {
       try {
-        const res = await api.login(this.email, this.password);
-        if (res.status == 200) {
-          localStorage.setItem('access_token', res.data.access_token)
-          // Swal.fire({
-          //     title: 'Đăng nhập thành công',
-          //     icon: 'success',
-          //     confirmButtonText: 'Success',
-          // })
-          this.$router.push({ path: '/' })
+        const data = {
+          email: this.email,
+          password: this.password
         }
+        this.store.login(data)
+        this.$router.push({ path: '/' })
+
       } catch (error) {
         this.wrongEmail = true;
         this.wrongPw = true;
@@ -68,13 +69,13 @@ export default {
         </div>
         <div class="user-box">
           <input type="password" name="password" required="" v-model="password" @change="isPasswordValid"
-            @keyup.enter="login()">
+            @keyup.enter="signIn()">
           <span v-if="wrongPw">Mật khẩu phải có ít nhất 8 kí tự, bao gồm 1 chữ hoa,<br> 1 chữ
             thường, 1 chữ số, 1 kí
             tự đặc biệt</span>
           <label>Password</label>
         </div>
-        <button class="user-a" href="#" @click="login">
+        <button class="user-a" href="#" @click="signIn()">
           <span></span>
           <span></span>
           <span></span>

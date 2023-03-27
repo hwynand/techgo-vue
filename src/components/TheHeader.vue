@@ -71,11 +71,9 @@
             </button>
             <div class="log-out">
               <ul>
-                <li>
-                  <router-link to="/User">
-                    Thông tin tài khoản
-                  </router-link>
-                </li>
+                <router-link to="/User">
+                  <li>Thông tin tài khoản</li>
+                </router-link>
                 <li @click="handleLogOut()">
                   Đăng xuất
                 </li>
@@ -172,8 +170,6 @@
 <script>
 import { mapState, mapActions } from 'pinia'
 import { useUsersStore } from '@/stores/users'
-
-// import { api } from '../../api';
 import { items, item_title, listElectric, listMacbook, listCategory } from '../share/Data.js';
 import ListTechgo from './TheHeaderListTechgo.vue';
 import ListElectric from './TheHeaderListElectric.vue';
@@ -183,7 +179,7 @@ export default {
   components: {
     ListTechgo,
     ListElectric,
-    ListMacbook
+    ListMacbook,
   },
 
   data() {
@@ -208,7 +204,7 @@ export default {
     }
   },
   methods: {
-    // ...mapActions(useUsersStore, ['logout']),
+    ...mapActions(useUsersStore, ['logout']),
     reload() {
       location.reload();
     },
@@ -216,7 +212,6 @@ export default {
 
     async onClickSearch() {
       try {
-
         this.showSearches = !this.showSearches;
       } catch (error) {
         console.log(error);
@@ -229,7 +224,7 @@ export default {
     },
 
     handleLogOut() {
-      localStorage.removeItem('access_token');
+      this.logout()
       this.reload()
     },
 
@@ -285,8 +280,12 @@ export default {
   },
 
   async created() {
-    console.log('created');
+    console.log('created', this.auth);
   },
+
+  // mounted() {
+  //   this.reload()
+  // }
 
 }
 </script>
@@ -565,7 +564,7 @@ a {
 .log-out {
   position: absolute;
   right: 10%;
-  top: 100%;
+  top: 62%;
   width: 11.5%;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   color: #2c3e50;

@@ -33,13 +33,13 @@ export const useUsersStore = defineStore('users', {
       const params = new URLSearchParams()
       params.append('username', email)
       params.append('password', password)
-
       const res = await api.post('/login/access-token', params)
+      console.log('res', res.status)
       if (res.status === 200) {
         localStorage.setItem('access-token', res.data.access_token)
-        this.auth.isLoggedIn = true
         localStorage.setItem('isLoggedIn', 'true')
         const resProfile = await this.getProfile()
+        this.auth.isLoggedIn = true
       }
       return res
     },
