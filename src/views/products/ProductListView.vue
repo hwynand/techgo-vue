@@ -85,7 +85,7 @@
                       <span><i class="fa-solid fa-sort-down"></i></span>
                     </p>
                     <ul class="products-filter">
-                      <li v-for="(items, i) in items" :key="i" @click="handaleFilterItem()">{{
+                      <li v-for="(items, i) in items" :key="i" @click.prevent="handaleFilterItem()">{{
                         items.title }}</li>
                     </ul>
                   </div>
@@ -97,7 +97,8 @@
                     <!-- <ProductCart :products="products" :paginatedItems="paginatedItems">
                     </ProductCart> -->
                     <ProductCard v-for="(product, i) in products" :key="i" :name="product.name"
-                      :brand="product.brand.name" :url="product.product_variants[0].images[0].image_path">
+                      :brand="product.brand.name" :url="product.product_variants[0].images[0].image_path"
+                      @click="handleClickProductDetailView(product.id)">
                     </ProductCard>
 
                   </div>
@@ -109,7 +110,6 @@
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -207,6 +207,11 @@ export default {
     handaleFilterItem(items) {
       console.log(items);
     },
+
+    handleClickProductDetailView(id) {
+      console.log('id produc', id);
+      this.$router.push({ path: `/san-pham/${id}` })
+    }
 
 
 
@@ -449,6 +454,7 @@ export default {
 :deep(.card) {
   width: 100% !important;
   margin: 8px;
+  cursor: pointer;
 }
 
 :deep(.header-left a) {

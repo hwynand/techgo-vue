@@ -19,7 +19,8 @@ export const useUsersStore = defineStore('users', {
     auth: {
       isLoggedIn: false,
       user: null
-    }
+    },
+    count: 0,
   }),
   getters: {
 

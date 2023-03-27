@@ -10,6 +10,7 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import VueEasyLightbox from 'vue-easy-lightbox'
 
 import './assets/main.css'
 
@@ -23,5 +24,6 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 app.use(vuetify)
+app.use(VueEasyLightbox)
 app.mount('#app')
 

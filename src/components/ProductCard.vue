@@ -18,7 +18,7 @@
                     <span @click="click" class="card__by ">
                         <span href="#" class="card__price">25.000.000đ</span>
                     </span>
-                    <div class="wrapper">
+                    <div class="wrapper" @click.stop="handaleAddCart">
                         <a href="#0" class="btn_add-cart">
                             <span class="cart_span"><i class="fa-solid fa-cart-shopping"></i></span>
                             <span class="add-cards">Thêm giỏ hàng</span>
@@ -62,7 +62,12 @@ export default {
     methods: {
         click() {
             console.log(this.name);
+        },
+
+        handaleAddCart() {
+            console.log('add cart');
         }
+
     }
 }
 </script>

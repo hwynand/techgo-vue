@@ -25,9 +25,9 @@ export const api = {
     async updateProfile(token, data) {
         return axios.put(`${apiUrl}/users/me`, data, authHeaders(token));
     },
-    async getProducts(token, id, skip, limit) {
+    async getProducts(token, id, skip, limit, productId) {
         // console.log('keyWord', keyWord);
-        return axios.get(`${apiUrl}/products/${skip || skip == 0 ? (`?skip=${skip}`) : ''}${id ? (`&brand_id=${id}`) : ''}${limit ? (`&limit=${limit}`) : ''} `, authHeaders(token))
+        return axios.get(`${apiUrl}/products/${skip || skip == 0 ? (`?skip=${skip}`) : ''}${id ? (`&brand_id=${id}`) : ''}${limit ? (`&limit=${limit}`) : ''}${productId ? productId : ''} `, authHeaders(token))
     },
 
     async getBrand(token) {
