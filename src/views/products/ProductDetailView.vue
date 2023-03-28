@@ -63,7 +63,7 @@
                 <button @click="onClickPlus"><i class="fa-solid fa-plus"></i></button>
               </div>
               <div class="product-btn">
-                <button class="btn btn-3" @click="AddCart">Thêm vào giỏ</button>
+                <button class="btn btn-3" @click="AddCart()">Thêm vào giỏ</button>
                 <button class="product-btn-buy btn btn-3">Mua ngay</button>
               </div>
               <div class="product-item-i">
@@ -172,6 +172,7 @@ export default {
 
   data() {
     return {
+      store: useUsersStore(),
       slug: this.$route.params.slug,
       displayedContent: "",
       isCollapsed: false,
@@ -223,7 +224,7 @@ export default {
   },
 
   computed: {
-    ...mapActions(useUsersStore, ['checkLoggedIn']),
+
 
     // getSelectedProduc() {
     //   let index = this.currentIndex;
@@ -275,40 +276,46 @@ export default {
   },
 
   methods: {
+    ...mapActions(useUsersStore, ['checkLoggedIn']),
     click() {
       console.log(this.$route.params.slug, 'id');
       console.log(this.getSelectedProduc);
     },
 
     clickColor(items, i) {
-      console.log('items', items.name);
+      console.log('items', items);
       this.currentIndex = i;
     },
 
 
-    AddCart() {
-      let index = this.currentIndex;
-      let inventory = this.detailProduct.product_variants[index].inventory
-      const isLoggedIn = localStorage.getItem('isLoggedIn')
-      if (!isLoggedIn) {
-        this.$router.push({ path: '/dang-nhap' })
-      } else {
-        if (inventory > 0) {
-          Swal.fire({
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 1500,
-            text: 'Modal with a custom image.',
-            title: this.detailProduct.name,
-            imageUrl: 'https://unsplash.it/400/200',
-            imageWidth: 150,
-            imageHeight: 100,
-            imageAlt: 'Custom image',
-          })
+    async AddCart() {
+      try {
+        let index = this.currentIndex;
+        let inventory = this.detailProduct.product_variants[index].inventory
+        const checkAut = await this.checkLoggedIn
+        if (!checkAut) {
+          this.$router.push({ path: '/dang-nhap' })
+          console.log('checkAut 298', checkAut);
         } else {
-          Swal.fire('Sản phẩm hết hàng')
+          if (inventory > 0) {
+            Swal.fire({
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 1500,
+              text: 'Modal with a custom image.',
+              title: this.detailProduct.name,
+              imageUrl: 'https://unsplash.it/400/200',
+              imageWidth: 150,
+              imageHeight: 100,
+              imageAlt: 'Custom image',
+            })
+          } else {
+            Swal.fire('Sản phẩm hết hàng')
 
+          }
         }
+      } catch (error) {
+        console.log(error);
       }
 
 

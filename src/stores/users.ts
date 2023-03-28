@@ -60,6 +60,7 @@ export const useUsersStore = defineStore('users', {
       const isLoggedIn = localStorage.getItem('isLoggedIn')
       const userData = localStorage.getItem('user')
       if (isLoggedIn && userData) {
+        console.log('userData', userData);
         console.log('checked')
         this.auth.isLoggedIn = true
         this.auth.user = JSON.parse(userData)
