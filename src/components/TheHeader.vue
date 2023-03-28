@@ -558,7 +558,6 @@ a {
 
 .fa-chevron-down {
   margin-left: 6px;
-  padding-top: 6px;
 }
 
 .log-out {

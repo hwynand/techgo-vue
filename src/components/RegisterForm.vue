@@ -62,6 +62,9 @@
 
 import Swal from 'sweetalert2';
 import { api } from '../api';
+import { mapActions } from 'pinia';
+import { useUsersStore } from '@/stores/users'
+
 export default {
     data() {
         return {
@@ -84,6 +87,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(useUsersStore, ['register']),
         async signIn() {
             try {
                 let email = this.dataSignUp.email
@@ -100,7 +104,8 @@ export default {
                     address,
                     phone_number
                 }
-                const res = await api.register(data)
+                const res = await this.register({ data })
+                console.log('res', res);
                 if (res.status == 200) {
                     Swal.fire({
                         title: 'Đăng ký success',
@@ -109,6 +114,15 @@ export default {
                     })
                     this.$router.push({ path: '/dang-nhap' })
                 }
+                // const res = await api.register(data)
+                // if (res.status == 200) {
+                //     Swal.fire({
+                //         title: 'Đăng ký success',
+                //         icon: 'success',
+                //         confirmButtonText: 'Success',
+                //     })
+                //     this.$router.push({ path: '/dang-nhap' })
+                // }
             } catch (error) {
                 if (this.dataSignUp.address == '') {
                     this.wrongAddress = true;
