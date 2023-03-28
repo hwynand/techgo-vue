@@ -170,15 +170,15 @@ export default {
   },
 
   computed: {
-
+    ...mapState(useProductsStore, ['allProducts'])
   },
 
   methods: {
     ...mapActions(useProductsStore, [
-      'getProducts', 
-      'getPromotionProducts', 
-      'getTopSellerProducts', 
-      'getNewCollectionProducts', 
+      'getProducts',
+      'getPromotionProducts',
+      'getTopSellerProducts',
+      'getNewCollectionProducts',
       'getHighEndProducts'
     ]),
     getAllProducts() {
@@ -210,17 +210,15 @@ export default {
   },
 
   async created() {
-    this.getAllProducts()
+    await this.getAllProducts()
+    await this.getProducts()
     try {
-      const token = localStorage.getItem('access_token');
-      const res = await api.getProducts(token);
-      if (res.status == 200) {
-        this.data = res.data
-        console.log(this.data);
-      }
+      const res = await this.allProducts
+      this.data = res
     } catch (error) {
       console.log(error);
     }
+
   },
   mounted() {
     setInterval(() => { this.startTimer() }, 1000);
@@ -475,13 +473,13 @@ export default {
   color: #f39c12;
 }
 
-::v-deep .card {
+:deep(.card) {
   margin-right: 0 !important;
   border-radius: 0;
   width: 100%;
 }
 
-::v-deep .card__info {
+:deep(.card__info) {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }

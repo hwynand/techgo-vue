@@ -566,7 +566,7 @@ a {
 .log-out {
   position: absolute;
   right: 10%;
-  top: 100%;
+  top: 62%;
   width: 11.5%;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   color: #2c3e50;

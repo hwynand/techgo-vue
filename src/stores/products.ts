@@ -1,4 +1,4 @@
-import {defineStore} from 'pinia'
+import { defineStore } from 'pinia'
 
 import { api } from "../apis"
 
@@ -59,15 +59,25 @@ export const useProductsStore = defineStore('products', {
     topSellerProducts: [] as Product[],
     newCollectionProducts: [] as Product[],
     highEndProducts: [] as Product[],
+    allBrand: [] as Product[],
   }),
 
   actions: {
     async getProducts(params: ParamsGetProduct) {
+      console.log('params', params);
       try {
         const res = await api.get('/products/', { params })
         this.allProducts = res.data
       } catch (e) {
         console.error(e)
+      }
+    },
+    async getBrand() {
+      try {
+        const res = await api.get('/brands/')
+        this.allBrand = res.data
+      } catch (error) {
+        console.log(error);
       }
     },
     async getPromotionProducts(params: ParamsGetProduct) {
@@ -122,5 +132,6 @@ export const useProductsStore = defineStore('products', {
         console.error(e)
       }
     },
+
   }
 })

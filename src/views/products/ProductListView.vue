@@ -39,9 +39,7 @@
                           <input type="checkbox" :value="brand" v-model="selectedBrand"
                             @click="filterBrands(brand.id, $event)">
                           <span> {{ brand.name }}</span>
-
                           <!-- <span> {{ brand }}</span> -->
-
                         </li>
                       </ul>
                     </div>
@@ -75,7 +73,7 @@
                 <div class="products-promotion">
                   <h3>Tất cả sản phẩm</h3>
                   <span style="width:60%">
-                    <span style="font-weight: bold;">{{ tatalProducs }}</span>
+                    <span style="font-weight: bold;">{{ totalProducs }}</span>
                     <span style="font-size: 14px"> sản phẩm</span>
                   </span>
                   <div class="products-content">
@@ -93,13 +91,19 @@
                 <!-- ------------------------------------------------------------------>
 
                 <div class="products-cart">
-                  <div class="list-CartProduct">
-                    <!-- <ProductCart :products="products" :paginatedItems="paginatedItems">
-                    </ProductCart> -->
+                  <div class="list-CartProduct" v-if="products.length !== 0">
                     <ProductCard v-for="(product, i) in products" :key="i" :name="product.name"
                       :brand="product.brand.name" :url="product.product_variants[0].images[0].image_path">
                     </ProductCard>
+                  </div>
 
+                  <!-- ------------------------------------------------------------------>
+
+                  <div class="list-CartProduct" v-else>
+                    <div class="no-data">
+                      <i class="fa-solid fa-box-open"></i>
+                      <p>Không có sản phẩm</p>
+                    </div>
                   </div>
                 </div>
                 <div class="text-center">
@@ -122,6 +126,9 @@
 <script>
 import { api } from '../../api';
 import ProductCard from '../../components/ProductCard.vue'
+import { mapActions, mapState } from 'pinia'
+import { useProductsStore } from '@/stores/products'
+
 
 export default {
   components: {
@@ -131,8 +138,7 @@ export default {
   data() {
     return {
       products: [],
-      productList: [],
-      productLength: [],
+      productTatal: [],
       page: 1,
       size: 10,
       panel: [0, 1],
@@ -150,11 +156,17 @@ export default {
       ],
       selectedBrand: [],
       selectedPrice: [],
+      idBrands: [],
+      isShowProducts: false,
     }
   },
   methods: {
+    ...mapActions(useProductsStore, [
+      'getProducts',
+      'getBrand',
+    ]),
+
     click() {
-      // console.log(this.products, 'product');
       console.log(this.products);
     },
 
@@ -164,14 +176,29 @@ export default {
     },
 
     //-------re-render products
-    async renderProducts(id, skip, limit) {
+    async renderProducts(keyword, category_id, brand_id, skip, limit) {
+      let param = {
+        keyword,
+        category_id,
+        brand_id,
+        skip,
+        limit,
+      };
       try {
-        const token = localStorage.getItem('access_token');
-        const res = await api.getProducts(token, id, skip, limit);
-        if (res) {
-          this.products = res.data
-          console.log('data', this.products = res.data);
-        }
+        await this.getProducts(param)
+        const res = await this.allProducts
+        this.products = res
+        console.log('data', this.products);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async getAllBrands() {
+      try {
+        await this.getBrand()
+        const res = await this.allBrand
+        this.menuBrand = res
       } catch (error) {
         console.log(error);
       }
@@ -181,19 +208,24 @@ export default {
       console.log('page', page);
       const skip = (page - 1) * size;
       const limit = size
-      this.renderProducts(null, skip, limit)
+      this.renderProducts('', null, null, skip, limit)
     },
 
     async filterBrands(id, e) {
       const skip = (this.page - 1) * this.size
       const limit = this.size
+
+      if (!this.idBrands.includes(id)) {
+        this.idBrands.push(id)
+        console.log('idBrands1', this.idBrands)
+      } else {
+        this.idBrands = this.idBrands.filter((e) => {
+          return e !== id
+        });
+        console.log('idBrands2', this.idBrands)
+      }
       try {
-        if (e.target.checked == true) {
-          this.renderProducts(id, skip, limit)
-        }
-        if (e.target.checked !== true) {
-          this.renderProducts(null, skip, limit)
-        }
+        this.renderProducts('', null, this.idBrands, skip, limit)
       } catch (error) {
         console.log(error);
       }
@@ -208,12 +240,15 @@ export default {
       console.log(items);
     },
 
-
-
   },
 
   computed: {
-    tatalProducs() {
+    ...mapState(useProductsStore, [
+      'allProducts',
+      'allBrand',
+    ]),
+
+    totalProducs() {
       let tatal = this.products
       return tatal.length
     },
@@ -225,38 +260,37 @@ export default {
     },
 
     totalPages() {
-      console.log('totalPages', this.productList.length / this.size);
-      return Math.ceil(this.productList.length / this.size);
-    }
+      console.log('totalPages', this.productTatal.length / this.size);
+      return Math.ceil(this.productTatal.length / this.size);
+    },
+
   },
 
-  async beforeCreate() {
-    const token = localStorage.getItem('access_token');
-    const res = await api.getProducts(token);
-    if (res.status == 200) {
-      this.productList = res.data
-      console.log('data beforeCreate', this.products = res.data);
-    }
-    console.log('Nothing gets called before me!')
+  async beforeMount() {
+    await this.renderProducts('', null, null, 0, this.size)
   },
 
-  async created(id) {
-    console.log(this.products, 'created')
-    //------products
-    this.renderProducts(id, 0, this.size);
+
+  async created() {
+    //------products total------
+    try {
+      await this.getProducts()
+      const res = await this.allProducts
+      this.productTatal = res
+      console.log('data', this.products);
+    } catch (error) {
+      console.log(error);
+    }
 
     // ----brands
-    const token = localStorage.getItem('access_token');
-    const resBrand = await api.getBrand(token);
-    if (resBrand.status == 200) {
-      this.menuBrand = resBrand.data
-    }
+    await this.getAllBrands()
 
-    // console.log(this.$store)
   },
 
-  mounted() {
-    console.log(this.products, 'mounted')
+  async mounted() {
+    // const res = await this.renderProducts('', null, null, null, null)
+    // this.productTatal = res
+    console.log('mounted')
   }
 
   // watch: {
@@ -431,6 +465,7 @@ export default {
 .products-cart {
   min-height: 80vh;
   margin-top: 12px;
+  position: relative;
 }
 
 .list-CartProduct {
@@ -440,6 +475,25 @@ export default {
 
 :deep(.v-checkbox .v-selection-control) {
   min-height: 0 !important;
+}
+
+.no-data {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  top: 40%;
+  left: 40%;
+}
+
+.no-data p {
+  color: gray;
+  font-size: 1.5rem;
+}
+
+.fa-box-open {
+  color: gray;
+  font-size: 1.5rem;
+  margin-right: 12px;
 }
 
 /* ::v-deep .v-pagination__list {
