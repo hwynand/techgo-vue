@@ -123,6 +123,9 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'pinia'
+import { useProductsStore } from '@/stores/products'
+
 import HomeBannerImageVue from '../components/HomeBannerImage.vue'
 import HomeCategoryCardVue from '../components/HomeCategoryCard.vue'
 import HomeSlideVue from '../components/HomeSlide.vue'
@@ -171,6 +174,19 @@ export default {
   },
 
   methods: {
+    ...mapActions(useProductsStore, [
+      'getProducts', 
+      'getPromotionProducts', 
+      'getTopSellerProducts', 
+      'getNewCollectionProducts', 
+      'getHighEndProducts'
+    ]),
+    getAllProducts() {
+      this.getPromotionProducts()
+      this.getTopSellerProducts()
+      this.getNewCollectionProducts()
+      this.getHighEndProducts()
+    },
     startTimer: function () {
       const timeNow = new Date().getTime();
       const timeDifference = this.countDownToTime - timeNow;
@@ -194,6 +210,7 @@ export default {
   },
 
   async created() {
+    this.getAllProducts()
     try {
       const token = localStorage.getItem('access_token');
       const res = await api.getProducts(token);

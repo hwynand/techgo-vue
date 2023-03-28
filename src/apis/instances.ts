@@ -4,11 +4,18 @@ import { baseUrl } from '../utils'
 
 const api = axios.create({
   baseURL: baseUrl,
+  paramsSerializer: {
+    indexes: null
+  }
 })
 
 const authApi = axios.create({
   baseURL: baseUrl,
+  paramsSerializer: {
+    indexes: null
+  }
 })
+
 
 const onFulfilled = (config: InternalAxiosRequestConfig) => {
   const accessToken = localStorage.getItem('access-token')
