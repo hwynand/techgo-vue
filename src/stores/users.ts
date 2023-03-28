@@ -43,6 +43,10 @@ export const useUsersStore = defineStore('users', {
       }
       return res
     },
+    async register({ data }) {
+      const res = await api.post('/register', data)
+      return res
+    },
     async getProfile() {
       const res = await authApi.get('/users/me')
       if (res.status === 200) {

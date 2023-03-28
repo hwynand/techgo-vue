@@ -45,9 +45,11 @@ export default {
           email: this.email,
           password: this.password
         }
-        this.store.login(data)
-        this.$router.push({ path: '/' })
-
+        const res = await this.store.login(data)
+        console.log('res', res);
+        if (res.status === 200) {
+          this.$router.push({ path: '/' })
+        }
       } catch (error) {
         this.wrongEmail = true;
         this.wrongPw = true;
