@@ -1,5 +1,7 @@
 import {defineStore} from 'pinia'
 
+import { api } from "../apis"
+
 interface Category {
   id: number,
   name: string,
@@ -34,8 +36,25 @@ interface Product {
   product_variants: ProductVariant[],
 }
 
+interface ParamsGetProduct {
+  keyword?: string,
+  category_id?: number[],
+  brand_id?: number[],
+  skip?: number,
+  limit?: number,
+}
+
+enum ProductTypes {
+  ALL = 0,
+  PROMOTION = 1,
+  TOP_SELLER = 2,
+  NEW_COLLECTION = 3,
+  HIGH_END = 4
+}
+
 export const useProductsStore = defineStore('products', {
   state: () => ({
+    allProducts: [] as Product[],
     promotionProducts: [] as Product[],
     topSellerProducts: [] as Product[],
     newCollectionProducts: [] as Product[],
@@ -43,8 +62,65 @@ export const useProductsStore = defineStore('products', {
   }),
 
   actions: {
-    getPromotionProducts() {
-      this.promotionProducts = []
-    }
+    async getProducts(params: ParamsGetProduct) {
+      try {
+        const res = await api.get('/products/', { params })
+        this.allProducts = res.data
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    async getPromotionProducts(params: ParamsGetProduct) {
+      try {
+        const res = await api.get('/products/', {
+          params: {
+            ...params,
+            type: ProductTypes.PROMOTION,
+          }
+        })
+        this.promotionProducts = res.data
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    async getTopSellerProducts(params: ParamsGetProduct) {
+      try {
+        const res = await api.get('/products/', {
+          params: {
+            ...params,
+            type: ProductTypes.TOP_SELLER,
+          }
+        })
+        this.topSellerProducts = res.data
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    async getNewCollectionProducts(params: ParamsGetProduct) {
+      try {
+        const res = await api.get('/products/', {
+          params: {
+            ...params,
+            type: ProductTypes.NEW_COLLECTION,
+          }
+        })
+        this.newCollectionProducts = res.data
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    async getHighEndProducts(params: ParamsGetProduct) {
+      try {
+        const res = await api.get('/products/', {
+          params: {
+            ...params,
+            type: ProductTypes.HIGH_END,
+          }
+        })
+        this.highEndProducts = res.data
+      } catch (e) {
+        console.error(e)
+      }
+    },
   }
 })
