@@ -292,33 +292,32 @@ export default {
       try {
         let index = this.currentIndex;
         let inventory = this.detailProduct.product_variants[index].inventory
-        const checkAut = await this.checkLoggedIn
-        if (!checkAut) {
+        // const checkAut = this.checkLoggedIn()
+        const isLoggedIn = localStorage.getItem('isLoggedIn')
+        const userData = localStorage.getItem('user')
+        if (!isLoggedIn && !userData) {
           this.$router.push({ path: '/dang-nhap' })
-          console.log('checkAut 298', checkAut);
+          console.log('checkAut', checkAut);
+        } else if (inventory > 0) {
+          Swal.fire({
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1500,
+            text: 'Modal with a custom image.',
+            title: this.detailProduct.name,
+            imageUrl: 'https://unsplash.it/400/200',
+            imageWidth: 150,
+            imageHeight: 100,
+            imageAlt: 'Custom image',
+          })
         } else {
-          if (inventory > 0) {
-            Swal.fire({
-              position: 'top-end',
-              showConfirmButton: false,
-              timer: 1500,
-              text: 'Modal with a custom image.',
-              title: this.detailProduct.name,
-              imageUrl: 'https://unsplash.it/400/200',
-              imageWidth: 150,
-              imageHeight: 100,
-              imageAlt: 'Custom image',
-            })
-          } else {
-            Swal.fire('Sản phẩm hết hàng')
+          Swal.fire('Sản phẩm hết hàng')
 
-          }
         }
+
       } catch (error) {
         console.log(error);
       }
-
-
     },
 
     goToSlideIndex(index) {

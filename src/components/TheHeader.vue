@@ -11,9 +11,10 @@
 
         <div class="header-center">
           <div class="Search" v-click-outside="onClickOutsideSearch">
-            <input @click="onClickSearch" type="text" placeholder="Tìm kiếm sản phẩm..." v-model="searchProduct">
+            <input type="text" placeholder="Tìm kiếm sản phẩm..." v-model="searchProduct" @keyup.enter="onSearch()"
+              @click="onClickSearch()" @input="searchText($event)">
             <div class="header-center-button">
-              <button><i class="fa-sharp fa-solid fa-magnifying-glass"></i></button>
+              <button @click="onSearch()"><i class="fa-sharp fa-solid fa-magnifying-glass"></i></button>
             </div>
             <div v-if="showSearches" class="header-search">
               <p>Gợi ý cho bạn: {{ searchProduct }}</p>
@@ -170,6 +171,7 @@
 <script>
 import { mapState, mapActions } from 'pinia'
 import { useUsersStore } from '@/stores/users'
+import { useProductsStore } from '@/stores/products'
 import { items, item_title, listElectric, listMacbook, listCategory } from '../share/Data.js';
 import ListTechgo from './TheHeaderListTechgo.vue';
 import ListElectric from './TheHeaderListElectric.vue';
@@ -205,18 +207,42 @@ export default {
   },
   methods: {
     ...mapActions(useUsersStore, ['logout']),
+
+    ...mapActions(useProductsStore, [
+      'getProducts',
+    ]),
+
     reload() {
       location.reload();
     },
 
-
-    async onClickSearch() {
-      try {
-        this.showSearches = !this.showSearches;
-      } catch (error) {
-        console.log(error);
+    async onSearch() {
+      console.log('search', this.params)
+      let checkRoute = this.$route.path
+      if (checkRoute !== '/danh-sach-san-pham/:type') {
+        this.$router.push({ path: '/danh-sach-san-pham/:type' })
+        this.params.keyword = this.searchProduct
+        await this.getProducts(this.params)
+      } else {
+        this.params.keyword = this.searchProduct
+        await this.getProducts(this.params)
       }
+    },
 
+    async searchText(event) {
+      let value = event.target.value
+      let checkRoute = this.$route.path
+      if (value === '' && checkRoute === '/danh-sach-san-pham/:type') {
+        this.onSearch()
+        this.showSearches = false
+      } else if (value != '' && checkRoute === '/danh-sach-san-pham/:type') {
+        this.onSearch()
+      }
+      console.log('event: ', event.target.value);
+    },
+
+    onClickSearch() {
+      this.showSearches = !this.showSearches;
     },
 
     onClickOutsideSearch() {
@@ -276,7 +302,13 @@ export default {
   },
 
   computed: {
-    ...mapState(useUsersStore, ['auth'])
+    ...mapState(useUsersStore, [
+      'auth',
+    ]),
+    ...mapState(useProductsStore, [
+      'params',
+    ]),
+
   },
 
   async created() {

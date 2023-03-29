@@ -52,6 +52,7 @@ enum ProductTypes {
   HIGH_END = 4
 }
 
+
 export const useProductsStore = defineStore('products', {
   state: () => ({
     allProducts: [] as Product[],
@@ -59,7 +60,8 @@ export const useProductsStore = defineStore('products', {
     topSellerProducts: [] as Product[],
     newCollectionProducts: [] as Product[],
     highEndProducts: [] as Product[],
-    allBrand: [] as Product[],
+    allBrand: [] as Brand[],
+    params: {} as ParamsGetProduct
   }),
 
   actions: {
