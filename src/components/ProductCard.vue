@@ -1,5 +1,5 @@
 <template>
-    <div class="product-card">
+    <div class="product-card" @click.prevent="handleClickProductDetailView(id)">
         <div class="cards">
             <div class="card card--1">
                 <div class="card__img"></div>
@@ -16,14 +16,98 @@
                         </h3>
                     </div>
                     <span @click="click" class="card__by ">
-                        <span href="#" class="card__price">25.000.000đ</span>
+                        <span href="#" class="card__price">{{ formatPrice }}</span>
                     </span>
-                    <div class="wrapper" @click.stop="handaleAddCart">
-                        <a href="#0" class="btn_add-cart">
+
+                    <!-- ----------------modal -->
+                    <div class="text-center">
+                        <v-btn class="btn_add-cart " @click="showDetailModal(id)">
                             <span class="cart_span"><i class="fa-solid fa-cart-shopping"></i></span>
                             <span class="add-cards">Thêm giỏ hàng</span>
                             <div class="transition"></div>
-                        </a>
+
+                            <v-dialog v-model="dialog" activator="parent" width="auto">
+                                <v-card>
+                                    <div class="content-modal">
+                                        <div class="modal-left">
+                                            <v-carousel hide-delimiters v-model="currentIndex">
+                                                <v-carousel-item v-for="(item, i) in detailProduct.product_variants"
+                                                    :key="i" :src="item.images[0]?.image_path" cover></v-carousel-item>
+                                            </v-carousel>
+                                            <div class="modal-left-img">
+                                                <div class="item-img" v-for="(item, i) in detailProduct.product_variants"
+                                                    :key="i" @click="goToSlideIndex(i)">
+                                                    <img :src="item.images[0]?.image_path" alt="">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-right">
+                                            <h4>{{ detailProduct.name }}</h4>
+                                            <div class="product-center">
+                                                <p class="modal-status">Tình trạng:
+                                                    <span
+                                                        :class="[detailProduct.product_variants?.[currentIndex].inventory > 0 ? 'statusGold' : 'statusRed']">
+                                                        {{ detailProduct.product_variants?.[currentIndex].inventory > 0 ?
+                                                            'CònHàng' : 'Hết Hàng' }}
+                                                    </span>
+                                                    <!-- <span>{{ detailProduct.product_variants }}</span> -->
+                                                </p>
+                                                <span>Thương Hiệu:
+                                                    <span class="Trademark">
+                                                        {{ detailProduct.brand?.name }}
+                                                    </span>
+                                                </span>
+                                            </div>
+                                            <div class="Content-right-price">
+                                                <span>Giá: </span>
+                                                <span class="Content-right-span">{{
+                                                    onDiscount }}</span>
+                                            </div>
+                                            <div class="product-color">
+                                                <div class="box-color">
+                                                    <p>Màu sắc: </p>
+                                                    <p class="color-modal">đen</p>
+                                                </div>
+                                                <p class="product-color-Gold" :class="items.name"
+                                                    v-for="(items, i) in detailProduct.product_variants" :key="i"
+                                                    @click="clickColor(items, i)">
+                                                </p>
+                                                <!-- <p class="product-color-gray"></p>
+                                                <p class="product-color-black"></p>
+                                                <p class="product-color-Gold"></p>
+                                                <p class="product-color-moss_green"></p>
+                                                <p class="product-color-violet"></p> -->
+                                            </div>
+                                            <div class="product-number">
+                                                <p style="width:25%">Số Lượng:</p>
+                                                <button @click="onClickMinus()"><i class="fa-solid fa-minus"></i></button>
+                                                <p class="product-number-p">{{ number }}</p>
+                                                <button @click="onClickPlus()"><i class="fa-solid fa-plus"></i></button>
+                                            </div>
+                                            <div class="wrapper">
+                                                <a href="#0" @click="AddCart()" class="btn_add-cart" data-bs-toggle="modal">
+                                                    <span class="cart_span"><i class="fa-solid fa-cart-shopping"></i></span>
+                                                    <span class="add-cards">Thêm giỏ hàng</span>
+                                                    <div class="transition"></div>
+                                                </a>
+                                            </div>
+                                            <div class="detail">
+                                                <p @click="handleClickProductDetailView(id)">Xem chi tiết sản phẩm <i
+                                                        class="fa-solid fa-angles-right"></i></p>
+                                            </div>
+                                            <div class="product-item-i">
+                                                <span>Chia sẻ: </span>
+                                                <a href=""><i class="fa-brands fa-facebook"></i></a>
+                                                <a href=""><i class="fa-brands fa-facebook-messenger"></i></a>
+                                                <a href=""><i class="fa-brands fa-twitter"></i></a>
+                                                <a href=""><i class="fa-brands fa-pinterest"></i></a>
+                                                <a href=""><i class="fa-solid fa-link"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </v-card>
+                            </v-dialog>
+                        </v-btn>
                     </div>
                 </div>
                 <!-- <div class="card__info-hover">
@@ -41,6 +125,11 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'pinia'
+import { useProductsStore } from '@/stores/products'
+import { useCartStore } from '@/stores/cart'
+import Swal from 'sweetalert2';
+
 export default {
     props: {
         url: {
@@ -56,17 +145,133 @@ export default {
         brand: {
             type: String,
             required: true,
+        },
+
+        id: {
+            type: Number,
+            required: true,
+        },
+
+        price: {
+            type: Number,
+            required: true,
+        }
+
+
+    },
+    data() {
+        return {
+            dialog: false,
+            currentIndex: 0,
+            number: 1,
         }
     },
 
     methods: {
+        ...mapActions(useProductsStore, [
+            'getDetailProduct',
+        ]),
+        ...mapActions(useCartStore, [
+            'addCart',
+        ]),
+
         click() {
-            console.log(this.name);
+            console.log('click');
         },
 
-        handaleAddCart() {
+        handaleAddCart(id) {
             console.log('add cart');
-        }
+        },
+
+        handleClickProductDetailView(id) {
+            this.$router.push({ path: `/san-pham/${id}` })
+        },
+
+        goToSlideIndex(index) {
+            this.currentIndex = index;
+        },
+        showDetailModal(id) {
+            // console.log('id', id);
+            this.getDetailProduct({ id })
+        },
+        clickColor(items, i) {
+            // console.log('items', items);
+            this.currentIndex = i;
+        },
+        onClickPlus() {
+            let index = this.currentIndex;
+            let inventory = this.detailProduct.product_variants?.[index].inventory
+            if (inventory > 0 && this.number < inventory) {
+                this.number += 1;
+            } else {
+                alert('sản phẩm đã hết hàng')
+            }
+        },
+        onClickMinus() {
+            if (this.number > 1) {
+                this.number = this.number - 1;
+            }
+        },
+        async AddCart() {
+            try {
+                let index = this.currentIndex;
+                let inventory = this.detailProduct.product_variants[index].inventory
+
+                // const checkAut = this.checkLoggedIn()
+                const isLoggedIn = localStorage.getItem('isLoggedIn')
+                const userData = localStorage.getItem('user')
+                if (!isLoggedIn && !userData) {
+                    this.$router.push({ path: '/dang-nhap' })
+                } else if (inventory > 0) {
+                    let val = this.detailProduct.product_variants[index].id
+                    this.cartValue.product_variant_id = val
+                    this.cartValue.qty = this.number
+                    const res = await this.addCart(this.cartValue)
+                    this.dialog = false
+                    // this.reload()
+                } else {
+                    alert('sản phẩm đã hết hàng')
+
+                }
+
+            } catch (error) {
+                console.log(error);
+            }
+        },
+
+    },
+
+    computed: {
+        ...mapState(useProductsStore, [
+            'detailProduct'
+        ]),
+        ...mapState(useCartStore, [
+            'cartValue'
+        ]),
+
+
+        formatPrice() {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(this.price);
+        },
+
+        brandShow() {
+            return this.getDetailProduct.brand.name
+        },
+
+        onDiscount() {
+            let index = this.currentIndex;
+            let price = this.detailProduct.product_variants?.[index].price;
+            if (this.number == 1) {
+                return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(price);
+            } else {
+                let newPrice = price * this.number
+                return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(newPrice);
+            }
+        },
+
+    },
+
+    created() {
 
     }
 }
@@ -76,6 +281,9 @@ export default {
 /* .product-card {
     height: 100%;
 } */
+:deep(.v-dialog) {
+    align-items: end !important;
+}
 
 .details {
     font-size: 1rem;
@@ -220,19 +428,13 @@ export default {
     font-size: 1rem;
 }
 
-.wrapper {
-    text-align: center;
-    width: 100%;
-    position: relative;
-    color: white;
-}
-
 .btn_add-cart {
     text-transform: uppercase;
     text-align: center;
     position: relative;
     text-decoration: none;
     display: inline-block;
+    height: 40px;
 }
 
 .add-cards {
@@ -316,5 +518,274 @@ export default {
 
 .cart_span {
     margin-right: 6px;
+}
+
+:deep(.modal) {
+    width: 500px !important;
+    height: 400px !important;
+    background: white !important;
+}
+
+:deep(.btn_add-cart) {
+    height: 40px !important;
+    margin: 24px 0;
+    width: 94%;
+
+}
+
+
+.modal-left {
+    width: 50%;
+    padding: 20px;
+}
+
+.modal-right {
+    width: 50%;
+    padding: 20px 0;
+}
+
+.modal-right h4 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+}
+
+.item-img {
+    width: 20%;
+}
+
+.item-img img {
+    width: 100%;
+    height: 60px;
+    object-fit: contain;
+    padding: 6px;
+}
+
+.modal-left-img {
+    display: flex;
+}
+
+.content-modal {
+    display: flex;
+}
+
+.statusGold {
+    color: rgb(249, 187, 1);
+    margin-left: 4px;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.statusRed {
+    color: #e84118;
+    margin-left: 4px;
+    font-weight: 600;
+}
+
+.Content-right-price {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: 400;
+    border-bottom: 1px solid #b2bec3;
+    padding-bottom: 12px;
+}
+
+.Content-right-price span {
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+.Content-right-price .Content-right-span {
+    font-size: 1.5rem;
+}
+
+.Content-right-span {
+    font-size: 1.9rem !important;
+    font-weight: bold;
+    color: red;
+    margin-left: 24px;
+}
+
+.product-color {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    padding: 6px;
+}
+
+.product-color-gray {
+    background-color: rgb(220, 220, 220);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid white;
+    margin-left: 12px;
+}
+
+.product-color-black {
+    background-color: black;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid white;
+    margin-left: 12px;
+}
+
+.product-color-Gold {
+    background-color: #fffa65;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid white;
+    margin-left: 12px;
+}
+
+.product-color-moss_green {
+    background-color: #10ac84;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid white;
+    margin-left: 12px;
+}
+
+.product-color-violet {
+    background-color: #be2edd;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid white;
+    margin-left: 12px;
+}
+
+.product-number {
+    display: flex;
+    font-size: 1rem;
+    align-items: center;
+    margin: 12px 0;
+}
+
+.product-number p {
+    font-weight: 500;
+    margin-right: 12px;
+    padding: 6px;
+    margin-right: 0 !important;
+}
+
+.product-number-p {
+    padding: 0 18px !important;
+}
+
+.product-number button {
+    border: 1px solid #cecece;
+    padding: 4px;
+    width: 7%;
+}
+
+.product-number button i {
+    color: #cccc;
+}
+
+.product-number button i:hover {
+    color: black;
+}
+
+.product-number p {}
+
+:deep(.v-carousel) {
+    height: 450px !important;
+}
+
+:deep(.v-carousel-item) {
+    padding: 6px;
+}
+
+.product-item-i {
+    display: flex;
+    align-items: center;
+}
+
+.product-item-i i {
+    padding: 8px;
+    font-size: 1.5 rem;
+}
+
+.fa-facebook {
+    color: blue;
+}
+
+.fa-facebook-messenger {
+    color: #3498db;
+}
+
+.fa-twitter {
+    color: #2980b9;
+
+}
+
+.fa-pinterest {
+    color: #e74c3c;
+}
+
+.fa-link {
+    color: #95a5a6;
+}
+
+.modal-status {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.box-color p {
+    font-weight: 600;
+    margin-right: 12px;
+}
+
+.color-modal {
+    font-size: 0.8rem;
+    color: #575fcf;
+    margin-left: 8px;
+}
+
+.product-center {
+    width: 100%;
+    display: flex;
+    padding: 6px;
+    font-size: 1.5rem;
+}
+
+.product-center span {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.product-center p {
+    margin-right: 12px;
+}
+
+
+.Trademark {
+    color: rgb(249, 187, 1);
+    margin-left: 4px;
+    font-weight: 600;
+}
+
+.detail {
+    margin-bottom: 12px;
+    cursor: pointer;
+}
+
+.detail p {
+    color: #e67e22;
+}
+
+:deep(.v-img__img--cover) {
+    object-fit: contain;
+}
+
+:deep(.v-overlay__content) {
+    width: 60vw !important;
+    max-height: none !important;
 }
 </style>

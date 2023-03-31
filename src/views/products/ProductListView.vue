@@ -81,7 +81,7 @@
                       <span><i class="fa-solid fa-sort-down"></i></span>
                     </p>
                     <ul class="products-filter">
-                      <li v-for="(items, i) in items" :key="i" @click.prevent="handaleFilterItem()">{{
+                      <li v-for="(items, i) in items" :key="i" @click="handaleFilterItem()">{{
                         items.title }}</li>
                     </ul>
                   </div>
@@ -91,8 +91,8 @@
                 <div class="products-cart">
                   <div class="list-CartProduct" v-if="allProducts.length !== 0">
                     <ProductCard v-for="(product, i) in allProducts" :key="i" :name="product.name"
-                      :brand="product.brand.name" :url="product.product_variants[0].images[0].image_path"
-                      @click="handleClickProductDetailView(product.id)">
+                      :brand="product.brand.name" :url="product.product_variants[0].images[0].image_path" :id="product.id"
+                      :price="product.product_variants[0].price">
                     </ProductCard>
                   </div>
 
@@ -121,7 +121,6 @@
 </template>
 
 <script>
-import { api } from '../../api';
 import ProductCard from '../../components/ProductCard.vue'
 import { mapActions, mapState } from 'pinia'
 import { useProductsStore } from '@/stores/products'
@@ -206,11 +205,6 @@ export default {
     handaleFilterItem(items) {
       console.log(items);
     },
-
-    handleClickProductDetailView(id) {
-      this.$router.push({ path: `/san-pham/${id}` })
-    }
-
   },
 
   computed: {

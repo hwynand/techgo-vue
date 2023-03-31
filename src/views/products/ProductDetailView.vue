@@ -1,7 +1,7 @@
 <template>
-  <span @click="click">clickTest</span>
+  <!-- <span @click="click">clickTest</span>
   <br>
-  <span>{{ useUsersStore.count }}</span>
+  <span>{{ useUsersStore.count }}</span> -->
   <div class="product">
     <div class="product-content">
       <div class="product-margin">
@@ -47,8 +47,8 @@
               </div>
               <div class="product-color">
                 <p>Màu sắc: </p>
-                <p class="product-color-Gold" :class="items.name" v-for="(items, i) in detailProduct.product_variants"
-                  :key="i" @click="clickColor(items, i)">
+                <p class="product-color-Gold" v-for="(items, i) in detailProduct.product_variants" :key="i"
+                  @click="clickColor(items, i)">
                 </p>
                 <!-- <p class="product-color-gray"></p>
                 <p class="product-color-black"></p>
@@ -63,7 +63,7 @@
                 <button @click="onClickPlus"><i class="fa-solid fa-plus"></i></button>
               </div>
               <div class="product-btn">
-                <button class="btn btn-3" @click="AddCart()">Thêm vào giỏ</button>
+                <button id="liveToastBtn" class="btn btn-3" @click="AddCart()">Thêm vào giỏ</button>
                 <button class="product-btn-buy btn btn-3">Mua ngay</button>
               </div>
               <div class="product-item-i">
@@ -152,7 +152,20 @@
           </div>
         </div>
       </div>
+      <button type="button" class="btn btn-primary" id="liveToastBtn" @click="showToast()">Show live toast</button>
     </div>
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+      <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <strong class="me-auto">Bootstrap</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          Hello, world! This is a toast message.
+        </div>
+      </div>
+    </div>
+
     <vue-easy-lightbox :scrollDisabled="scrollDisabled" :escDisabled="escDisabled" :visible="visible" :imgs="imgs"
       :index="index" @hide="handleHide">
     </vue-easy-lightbox>
@@ -165,6 +178,8 @@ import { api } from '../../api';
 import Swal from 'sweetalert2';
 import { mapState, mapActions } from 'pinia'
 import { useUsersStore } from '@/stores/users'
+import { useCartStore } from '@/stores/cart'
+import { useProductsStore } from '@/stores/products'
 export default {
   component: {
     VueEasyLightbox,
@@ -205,25 +220,18 @@ export default {
         ],
         description_detail: "<div class=\"description-productdetail\">\n\t\t\t\t\t\t\t\t<p><strong>Đặc điểm nổi bật</strong></p><ul><li><p>Tivi NanoCell LG 4K (3840 x 2160) hiển thị hình ảnh sắc nét, chi tiết</p></li><li><p>Công nghệ NanoCell giúp hình ảnh có màu sắc thuần khiết và tinh tế hơn</p></li><li><p>Bộ xử lý α7 Gen4 Processor 4K phân tích và tối ưu hóa nội dung hiển thị</p></li><li><p>FILMMAKER MODE™ truyền tải phim chân thực như dưới góc nhìn đạo diễn</p></li><li><p>Công nghệ Dolby Atmos mang đến không gian âm thanh vòm sống động</p></li><li><p>Công nghệ AI Sound tinh chỉnh âm thanh dựa trên thể loại nội dung đang xem</p></li><li><p>Tivi LG hỗ trợ tìm kiếm bằng giọng nói giúp tìm kiếm nội dung tiện lợi hơn</p></li></ul><div> </div><h2>Thông số sản phẩm</h2><table id=\"tblGeneralAttribute\" border=\"1\" cellspacing=\"0\" style=\"background-color:#ffffff; border-collapse:collapse; border-spacing:0px; border:1px solid #eeeeee; box-sizing:border-box; color:#333333; font-family:Roboto,sans-serif; font-size:13px; line-height:20px; margin-bottom:20px; max-width:100%; min-width:500px; width:100%\" class=\"mce-item-table table table-bordered\"><tbody style=\"box-sizing: border-box;\"><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Model</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\"><table><tbody><tr><td><table><tbody><tr><td>50NANO86TPA</td></tr></tbody></table></td></tr></tbody></table></td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\"><table><tbody><tr><td>Nhà sản xuất</td></tr></tbody></table></td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">LG</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\"><table><tbody><tr><td>Xuất xứ</td></tr></tbody></table></td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">Indonesia</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Năm ra mắt</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">2021</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Thời gian bảo hành</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">24 tháng</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Loại Tivi</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">Tivi NanoCell</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Kích thước màn hình</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">50 inch</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Độ phân giải</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">4K (3840 x 2160) Pixels</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Công nghệ xử lí hình ảnh</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">X1 4K Processor, Direct LED Frame Dimming, HLG, Motionflow XR 200, HDR10, Auto Mode, 4K X-Reality PRO</td></tr></tbody></table>\n\t\t\t\t\t\t\t</div>"
       },
-      detailProduct: [],
       useUsersStore: useUsersStore()
     }
   },
 
-  async created() {
-    try {
-      const token = await localStorage.getItem('access_token');
-      const productId = this.slug
-      const resDetailProduct = await api.getProducts(token, null, null, null, productId)
-      if (resDetailProduct.status == 200) {
-        console.log(this.detailProduct = resDetailProduct.data, 'data');
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  },
 
   computed: {
+    ...mapState(useCartStore, ['cartValue']),
+    ...mapState(useProductsStore, [
+      'params',
+      'allProducts',
+      'detailProduct',
+    ]),
 
 
     // getSelectedProduc() {
@@ -247,6 +255,69 @@ export default {
       return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(oldPrice);
     },
 
+    // productColor() {
+    //   let index = this.currentIndex;
+    //   const nameColor = this.detailProduct.product_variants[index].name
+    //   if (nameColor === 'iphone14-promax-vàng') {
+    //     return 'product-color-Gold'
+    //   }
+    // }
+
+
+  },
+
+  methods: {
+    ...mapActions(useProductsStore, [
+      'getProducts',
+      'getDetailProduct',
+    ]),
+    ...mapActions(useUsersStore, ['checkLoggedIn']),
+    ...mapActions(useCartStore, ['addCart']),
+
+
+    click() {
+      console.log('adadada', this.allProducts);
+      // console.log(this.$route.params.slug, 'id');
+      // console.log(this.getSelectedProduc);
+    },
+
+    reload() {
+      location.reload();
+    },
+
+    clickColor(items, i) {
+      console.log('items', items);
+      this.currentIndex = i;
+    },
+
+
+    async AddCart() {
+      try {
+        let index = this.currentIndex;
+        let inventory = this.detailProduct.product_variants[index].inventory
+
+        // const checkAut = this.checkLoggedIn()
+        const isLoggedIn = localStorage.getItem('isLoggedIn')
+        const userData = localStorage.getItem('user')
+        if (!isLoggedIn && !userData) {
+          this.$router.push({ path: '/dang-nhap' })
+          console.log('checkAut', checkAut);
+        } else if (inventory > 0) {
+          let val = this.detailProduct.product_variants[index].id
+          this.cartValue.product_variant_id = val
+          this.cartValue.qty = this.number
+          const res = await this.addCart(this.cartValue)
+          // this.reload()
+        } else {
+          Swal.fire('Sản phẩm hết hàng')
+
+        }
+
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
     onClickPlus() {
       let index = this.currentIndex;
       let inventory = this.detailProduct.product_variants[index].inventory
@@ -263,63 +334,6 @@ export default {
       }
     },
 
-
-    // productColor() {
-    //   let index = this.currentIndex;
-    //   const nameColor = this.detailProduct.product_variants[index].name
-    //   if (nameColor === 'iphone14-promax-vàng') {
-    //     return 'product-color-Gold'
-    //   }
-    // }
-
-
-  },
-
-  methods: {
-    ...mapActions(useUsersStore, ['checkLoggedIn']),
-    click() {
-      console.log(this.$route.params.slug, 'id');
-      console.log(this.getSelectedProduc);
-    },
-
-    clickColor(items, i) {
-      console.log('items', items);
-      this.currentIndex = i;
-    },
-
-
-    async AddCart() {
-      try {
-        let index = this.currentIndex;
-        let inventory = this.detailProduct.product_variants[index].inventory
-        // const checkAut = this.checkLoggedIn()
-        const isLoggedIn = localStorage.getItem('isLoggedIn')
-        const userData = localStorage.getItem('user')
-        if (!isLoggedIn && !userData) {
-          this.$router.push({ path: '/dang-nhap' })
-          console.log('checkAut', checkAut);
-        } else if (inventory > 0) {
-          Swal.fire({
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 1500,
-            text: 'Modal with a custom image.',
-            title: this.detailProduct.name,
-            imageUrl: 'https://unsplash.it/400/200',
-            imageWidth: 150,
-            imageHeight: 100,
-            imageAlt: 'Custom image',
-          })
-        } else {
-          Swal.fire('Sản phẩm hết hàng')
-
-        }
-
-      } catch (error) {
-        console.log(error);
-      }
-    },
-
     goToSlideIndex(index) {
       this.currentIndex = index;
     },
@@ -328,6 +342,17 @@ export default {
       this.imgs = this.detailProduct.product_variants[i].images[0].image_path
       this.index = i;
       this.show()
+    },
+
+    showToast() {
+      const toastTrigger = document.getElementById('liveToastBtn')
+      const toastLiveExample = document.getElementById('liveToast')
+      if (toastTrigger) {
+        const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+        toastTrigger.addEventListener('click', () => {
+          toastBootstrap.show()
+        })
+      }
     },
 
     show() {
@@ -339,10 +364,37 @@ export default {
     },
 
   },
+
+  async created() {
+    console.log('data_slug', this.allProducts);
+    console.log('slug', this.slug);
+    try {
+      const id = this.slug
+      await this.getDetailProduct({ id })
+    } catch (error) {
+      console.log(error);
+    }
+
+
+    // try {
+    //   const token = await localStorage.getItem('access_token');
+    //   const productId = this.slug
+    //   const resDetailProduct = await api.getProducts(token, null, null, null, productId)
+    //   if (resDetailProduct.status == 200) {
+    //     console.log(this.detailProduct = resDetailProduct.data, 'data');
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
+  },
 }
 </script>
 
 <style scoped>
+.toast-container {
+  margin-top: 38px;
+}
+
 .btn {
   background: none;
   border: 1px solid #ff0000;

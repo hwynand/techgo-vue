@@ -1,13 +1,14 @@
 <script>
 import { mapActions } from 'pinia'
 import { useUsersStore } from '@/stores/users'
+import { useCartStore } from '@/stores/cart'
 import { api } from '../api'
 
 export default {
   data() {
     return {
-      email: '',
-      password: '',
+      email: 'test9@gmail.com',
+      password: 'Duydung@1',
       wrongEmail: false,
       wrongPw: false,
       store: useUsersStore(),
@@ -15,6 +16,7 @@ export default {
   },
   methods: {
     ...mapActions(useUsersStore, ['login']),
+    ...mapActions(useCartStore, ['getCart']),
 
     isEmailValid() {
       const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
@@ -49,6 +51,7 @@ export default {
         console.log('res', res);
         if (res.status === 200) {
           this.$router.push({ path: '/' })
+          this.getCart()
         }
       } catch (error) {
         this.wrongEmail = true;

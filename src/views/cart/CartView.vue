@@ -10,31 +10,34 @@
                     <div class="Content-block-left">
                         <h3>Giỏ hàng của bạn</h3>
                         <div class="left-p">
-                            <p>Bạn đang có <span> <b>{{ numberCart }} sản phẩm</b></span> trong giỏ hàng</p>
+                            <p>Bạn đang có <span> <b>{{ tatalProduct }} sản phẩm</b></span> trong giỏ hàng</p>
                         </div>
                         <div class="table-cart">
-                            <div class="media-items" v-for="(cart, index) in cart" :key="index">
+                            <div class="media-items" v-for="(cart, index) in allCart" :key="index">
                                 <div class="media-items-img">
-                                    <a href=""><img :src="cart.thumnail_image_links[0]" alt=""></a>
-                                    <div class="media-items-delete">
+                                    <a href=""><img :src="cart.product_variant.images[0].image_path" alt=""></a>
+                                    <div class="media-items-delete" @click="handaleDeleteCart(cart.id)">
                                         <p>Xoá</p>
                                     </div>
                                 </div>
                                 <div class="media-items-price-detail">
-                                    <p>{{ cart.name }}</p>
+                                    <p>{{ cart.product_variant.name }}</p>
                                     <p>
-                                        <span class="items-span">{{ cart.price }}</span>
-                                        <span class="items-span" :class="[cart.sale > 0 ? 'items-underlined' : '']">{{
-                                            cart.old_price
+                                        <span class="items-span">{{ formatPrice(cart.product_variant.price, cart.qty)
+                                        }}</span>
+                                        <span class="items-span" :class="[cart.qty > 0 ? 'items-underlined' : '']">{{
+                                            cart.product_variant.price
                                         }}</span>
                                     </p>
                                 </div>
                                 <div class="media-items-price-pay">
-                                    <p>{{ cart.price }}</p>
-                                    <div class="btn">
-                                        <button @click="onClickMinus(index)"><i class="fa-solid fa-minus"></i></button>
-                                        <p>{{ numberCart }}</p>
-                                        <button @click="onClickPlus(index)"><i class="fa-solid fa-plus"></i></button>
+                                    <p>{{ priceOder }}</p>
+                                    <div class="btn-cart">
+                                        <button @click="onClickMinus(cart, cart.product_variant.id)"><i
+                                                class="fa-solid fa-minus"></i></button>
+                                        <p>{{ cart.qty }}</p>
+                                        <button @click="onClickPlus(cart, cart.product_variant.id)"><i
+                                                class="fa-solid fa-plus"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -82,7 +85,7 @@
                                     <li>Phí vận chuyển sẽ được tính ở trang thanh toán.</li>
                                     <li>Bạn cũng có thể nhập mã giảm giá ở trang thanh toán.</li>
                                 </ul>
-                                <router-link to="/pay"><button>Thanh toán</button></router-link>
+                                <router-link to="/*"><button>Thanh toán</button></router-link>
                             </div>
                         </div>
                         <div class="Policy">
@@ -152,6 +155,8 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'pinia'
+import { useCartStore } from '@/stores/cart'
 
 export default {
     components: {
@@ -159,102 +164,91 @@ export default {
     },
     data() {
         return {
-            cart: [
-                {
-                    name: "Smart Tivi NanoCell LG 4K 50 inch 50NANO86TPA",
-                    soldold: "Còn hàng",
-                    vendor: "LG",
-                    old_price: "24.900.000đ",
-                    price: "20.916.000đ",
-                    sale: 0.16,
-                    colors: [],
-                    image_link: [
-                        "//product.hstatic.net/200000516791/product/product_28_1_5043e2df20164cd1a4dbca5bb832937f_178c708a80114db18ee385c6f26fa0eb_master.png",
-                        "//product.hstatic.net/200000516791/product/product_23_2_4935dd9b12f34816a287d5453a9be876_1375950e93174ff09f60f8169ce733da_master.png",
-                        "//product.hstatic.net/200000516791/product/product_23_3_e6936a60b48144ceaad1f53a59872d4a_3f238840af0347e7878d2cecef17a53d_master.png",
-                        "//product.hstatic.net/200000516791/product/product_27_3_b64ab2ee0acc4c248b7d6c177663bc12_6dff7c9a80db4d77854643f9eafe18d6_master.png"
-                    ],
-                    thumnail_image_links: [
-                        "//product.hstatic.net/200000516791/product/product_28_1_5043e2df20164cd1a4dbca5bb832937f_178c708a80114db18ee385c6f26fa0eb_compact.png",
-                        "//product.hstatic.net/200000516791/product/product_23_2_4935dd9b12f34816a287d5453a9be876_1375950e93174ff09f60f8169ce733da_compact.png",
-                        "//product.hstatic.net/200000516791/product/product_23_3_e6936a60b48144ceaad1f53a59872d4a_3f238840af0347e7878d2cecef17a53d_compact.png",
-                        "//product.hstatic.net/200000516791/product/product_27_3_b64ab2ee0acc4c248b7d6c177663bc12_6dff7c9a80db4d77854643f9eafe18d6_compact.png"
-                    ],
-                    description_detail: "<div class=\"description-productdetail\">\n\t\t\t\t\t\t\t\t<p><strong>Đặc điểm nổi bật</strong></p><ul><li><p>Tivi NanoCell LG 4K (3840 x 2160) hiển thị hình ảnh sắc nét, chi tiết</p></li><li><p>Công nghệ NanoCell giúp hình ảnh có màu sắc thuần khiết và tinh tế hơn</p></li><li><p>Bộ xử lý α7 Gen4 Processor 4K phân tích và tối ưu hóa nội dung hiển thị</p></li><li><p>FILMMAKER MODE™ truyền tải phim chân thực như dưới góc nhìn đạo diễn</p></li><li><p>Công nghệ Dolby Atmos mang đến không gian âm thanh vòm sống động</p></li><li><p>Công nghệ AI Sound tinh chỉnh âm thanh dựa trên thể loại nội dung đang xem</p></li><li><p>Tivi LG hỗ trợ tìm kiếm bằng giọng nói giúp tìm kiếm nội dung tiện lợi hơn</p></li></ul><div> </div><h2>Thông số sản phẩm</h2><table id=\"tblGeneralAttribute\" border=\"1\" cellspacing=\"0\" style=\"background-color:#ffffff; border-collapse:collapse; border-spacing:0px; border:1px solid #eeeeee; box-sizing:border-box; color:#333333; font-family:Roboto,sans-serif; font-size:13px; line-height:20px; margin-bottom:20px; max-width:100%; min-width:500px; width:100%\" class=\"mce-item-table table table-bordered\"><tbody style=\"box-sizing: border-box;\"><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Model</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\"><table><tbody><tr><td><table><tbody><tr><td>50NANO86TPA</td></tr></tbody></table></td></tr></tbody></table></td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\"><table><tbody><tr><td>Nhà sản xuất</td></tr></tbody></table></td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">LG</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\"><table><tbody><tr><td>Xuất xứ</td></tr></tbody></table></td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">Indonesia</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Năm ra mắt</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">2021</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Thời gian bảo hành</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">24 tháng</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Loại Tivi</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">Tivi NanoCell</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Kích thước màn hình</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">50 inch</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Độ phân giải</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">4K (3840 x 2160) Pixels</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Công nghệ xử lí hình ảnh</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">X1 4K Processor, Direct LED Frame Dimming, HLG, Motionflow XR 200, HDR10, Auto Mode, 4K X-Reality PRO</td></tr></tbody></table>\n\t\t\t\t\t\t\t</div>"
-                },
-                {
-                    name: "Smart Tivi NanoCell LG 4K 50 inch 50NANO86TPA",
-                    soldold: "Còn hàng",
-                    vendor: "LG",
-                    old_price: "24.900.000đ",
-                    price: "20.916.000đ",
-                    sale: 0.16,
-                    colors: [],
-                    image_link: [
-                        "//product.hstatic.net/200000516791/product/product_28_1_5043e2df20164cd1a4dbca5bb832937f_178c708a80114db18ee385c6f26fa0eb_master.png",
-                        "//product.hstatic.net/200000516791/product/product_23_2_4935dd9b12f34816a287d5453a9be876_1375950e93174ff09f60f8169ce733da_master.png",
-                        "//product.hstatic.net/200000516791/product/product_23_3_e6936a60b48144ceaad1f53a59872d4a_3f238840af0347e7878d2cecef17a53d_master.png",
-                        "//product.hstatic.net/200000516791/product/product_27_3_b64ab2ee0acc4c248b7d6c177663bc12_6dff7c9a80db4d77854643f9eafe18d6_master.png"
-                    ],
-                    thumnail_image_links: [
-                        "//product.hstatic.net/200000516791/product/product_28_1_5043e2df20164cd1a4dbca5bb832937f_178c708a80114db18ee385c6f26fa0eb_compact.png",
-                        "//product.hstatic.net/200000516791/product/product_23_2_4935dd9b12f34816a287d5453a9be876_1375950e93174ff09f60f8169ce733da_compact.png",
-                        "//product.hstatic.net/200000516791/product/product_23_3_e6936a60b48144ceaad1f53a59872d4a_3f238840af0347e7878d2cecef17a53d_compact.png",
-                        "//product.hstatic.net/200000516791/product/product_27_3_b64ab2ee0acc4c248b7d6c177663bc12_6dff7c9a80db4d77854643f9eafe18d6_compact.png"
-                    ],
-                    description_detail: "<div class=\"description-productdetail\">\n\t\t\t\t\t\t\t\t<p><strong>Đặc điểm nổi bật</strong></p><ul><li><p>Tivi NanoCell LG 4K (3840 x 2160) hiển thị hình ảnh sắc nét, chi tiết</p></li><li><p>Công nghệ NanoCell giúp hình ảnh có màu sắc thuần khiết và tinh tế hơn</p></li><li><p>Bộ xử lý α7 Gen4 Processor 4K phân tích và tối ưu hóa nội dung hiển thị</p></li><li><p>FILMMAKER MODE™ truyền tải phim chân thực như dưới góc nhìn đạo diễn</p></li><li><p>Công nghệ Dolby Atmos mang đến không gian âm thanh vòm sống động</p></li><li><p>Công nghệ AI Sound tinh chỉnh âm thanh dựa trên thể loại nội dung đang xem</p></li><li><p>Tivi LG hỗ trợ tìm kiếm bằng giọng nói giúp tìm kiếm nội dung tiện lợi hơn</p></li></ul><div> </div><h2>Thông số sản phẩm</h2><table id=\"tblGeneralAttribute\" border=\"1\" cellspacing=\"0\" style=\"background-color:#ffffff; border-collapse:collapse; border-spacing:0px; border:1px solid #eeeeee; box-sizing:border-box; color:#333333; font-family:Roboto,sans-serif; font-size:13px; line-height:20px; margin-bottom:20px; max-width:100%; min-width:500px; width:100%\" class=\"mce-item-table table table-bordered\"><tbody style=\"box-sizing: border-box;\"><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Model</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\"><table><tbody><tr><td><table><tbody><tr><td>50NANO86TPA</td></tr></tbody></table></td></tr></tbody></table></td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\"><table><tbody><tr><td>Nhà sản xuất</td></tr></tbody></table></td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">LG</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\"><table><tbody><tr><td>Xuất xứ</td></tr></tbody></table></td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">Indonesia</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Năm ra mắt</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">2021</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Thời gian bảo hành</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">24 tháng</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Loại Tivi</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">Tivi NanoCell</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Kích thước màn hình</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">50 inch</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Độ phân giải</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">4K (3840 x 2160) Pixels</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Công nghệ xử lí hình ảnh</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">X1 4K Processor, Direct LED Frame Dimming, HLG, Motionflow XR 200, HDR10, Auto Mode, 4K X-Reality PRO</td></tr></tbody></table>\n\t\t\t\t\t\t\t</div>"
-                },
-            ],
             numberCart: 1,
             newPrice: 0,
-            cartItems: [],
+            priceOneProduct: 0,
+            qtyCart: 0,
 
         }
     },
     methods: {
+        ...mapActions(useCartStore, ['getCart', 'addCart', 'deleteCart']),
         // onDiscount(data) {
-        //     data.old_price - data.old_price * data.sale;
+        //     console.log('data');
         // },
 
-        // formatOldPrice(data) {
-        //     let oldPrice = data.old_price
-        //     return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(oldPrice);
-        // },
-
-        onClickPlus() {
-            this.numberCart = this.numberCart + 1
-        },
-
-        onClickMinus(index) {
-            if (this.numberCart <= 0) {
-                return
-            } else {
-                this.numberCart = this.numberCart - 1
-                console.log(index);
+        async onClickPlus(cart) {
+            try {
+                const id = cart.id
+                const cartValue = {
+                    product_variant_id: cart.product_variant.id,
+                    qty: cart.qty += 1
+                }
+                console.log('update', id, cartValue);
+                const res = await this.updateCart(id, cartValue)
+                if (res.status === 200) {
+                    this.getCart()
+                }
+            } catch (error) {
+                console.log(error);
             }
         },
 
-        addTocart(products) {
-            if (this.cartItems.includes(products)) {
-                alert("already there");
-            } else {
-                this.cartItems.push(products);
-            }
+        onClickMinus(cart, id) {
+            console.log(cart, id);
+            // const price = cart.product_variant.price
+            // const qty = cart.qty
+            // if (this.numberCart <= 0) {
+            //     alert('aaaa')
+            // } else {
+            //     this.numberCart = this.numberCart - 1
+            //     console.log(index);
+            // }
         },
 
+        formatPrice(price, qty) {
+            this.priceOneProduct = price
+            this.qtyCart = qty
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(price);
+        },
+
+        async handaleDeleteCart(id) {
+            this.deleteCart(id)
+            this.getCart()
+        }
 
     },
 
     computed: {
-        totalPrice() {
-            let total = 0;
-            total += this.cartItems.reduce((left, cur) => left + cur.price, 0);
-            return total;
+        ...mapState(useCartStore, ['allCart', 'count', 'totalCart', 'cartValue', 'updateCart']),
 
+
+        totalPrice() {
+            let totalPrice = 0;
+
+            this.allCart.forEach(item => {
+                totalPrice += item.product_variant.price * item.qty;
+            });
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(totalPrice);
         },
 
         tatalProduct() {
-            return this.cart.length
+            return this.count
+        },
+
+        priceOder() {
+            const number = this.priceOneProduct * this.qtyCart
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(number);
+        }
+
+    },
+
+    async created() {
+        try {
+            await this.getCart()
+            console.log('cartall', this.allCart);
+        } catch (error) {
+            console.log(error);
         }
     }
 }
@@ -383,13 +377,13 @@ export default {
 
 }
 
-.btn {
+.btn-cart {
     display: flex;
     align-items: center;
     padding: 6px 0;
 }
 
-.btn button {
+.btn-cart button {
     border: 0.5px solid #f3f4f4;
     background-color: #f9f9f9;
     height: 28px;
@@ -398,7 +392,7 @@ export default {
     font-weight: 500;
 }
 
-.btn p {
+.btn-cart p {
     border: 0.5px solid #f3f4f4;
     height: 28px;
     width: 36px;
@@ -445,7 +439,7 @@ export default {
 
 .Content-right-price {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
     font-size: 1.2rem;
     font-weight: 400;
     border-bottom: 1px solid #b2bec3;
@@ -456,6 +450,7 @@ export default {
     font-size: 1.5rem;
     font-weight: bold;
     color: red;
+    margin-left: 24px;
 }
 
 .Content-right-ul li {

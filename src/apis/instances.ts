@@ -13,7 +13,8 @@ const authApi = axios.create({
   baseURL: baseUrl,
   paramsSerializer: {
     indexes: null
-  }
+  },
+  headers: { Authorization: `Bearer + ${localStorage.getItem('access-token')}` }
 })
 
 

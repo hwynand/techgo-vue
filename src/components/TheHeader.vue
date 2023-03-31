@@ -29,7 +29,7 @@
         <div class="header-right">
           <div class="header-right-address">
             <button class="header-right-address-btn">
-              <span style="position: absolute; top: 15%; left: 0;">
+              <span style="position: absolute; top: 15%; left: 8px;">
                 <!-- <i class="fa-sharp fa-solid fa-map-pin"></i> -->
                 <i class="fa-solid fa-map-pin"></i>
               </span>
@@ -63,7 +63,7 @@
               <span><i class="fa-regular fa-circle-user"></i></span>
               <span class="header-right-span user-span">
                 <span>
-                  <router-link to="/User">
+                  <router-link to="*">
                     Tài khoản của <i class="fa-solid fa-chevron-down "></i>
                     <p class="text-user">{{ auth.user.firstname }} {{ auth.user.lastname }}</p>
                   </router-link>
@@ -72,7 +72,7 @@
             </button>
             <div class="log-out">
               <ul>
-                <router-link to="/User">
+                <router-link to="*">
                   <li>Thông tin tài khoản</li>
                 </router-link>
                 <li @click="handleLogOut()">
@@ -82,15 +82,13 @@
             </div>
           </div>
           <div class="header-right-cart">
-            <router-link to="*">
-              <button class="header-right-cart-btn">
-                <span><i class="fa-solid fa-cart-shopping"></i></span>
-                <span class="header-right-span">
-                  <span>Giỏ hàng</span>
-                  <span class="coutCart">{{ this.numberCart }}</span>
-                </span>
-              </button>
-            </router-link>
+            <button class="header-right-cart-btn" @click="linkCart()">
+              <span><i class="fa-solid fa-cart-shopping"></i></span>
+              <span class="header-right-span">
+                <span>Giỏ hàng</span>
+                <span class="coutCart">{{ count }}</span>
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -155,7 +153,7 @@
             <div class="content-center-img">
               <img src="https://theme.hstatic.net/200000516791/1000880762/14/header_03_policy_2_ico.png?v=2257" alt="">
             </div>
-            <div class="content-center-text">Miễn phí vận chuyển</div>
+            <div class="content-center-text" @click="click()">Miễn phí vận chuyển</div>
           </li>
           <li class="content-center-li">
             <div class="content-center-img">
@@ -172,6 +170,8 @@
 import { mapState, mapActions } from 'pinia'
 import { useUsersStore } from '@/stores/users'
 import { useProductsStore } from '@/stores/products'
+import { useCartStore } from '@/stores/cart'
+
 import { items, item_title, listElectric, listMacbook, listCategory } from '../share/Data.js';
 import ListTechgo from './TheHeaderListTechgo.vue';
 import ListElectric from './TheHeaderListElectric.vue';
@@ -188,8 +188,8 @@ export default {
     return {
       showSearches: false,
       searchItems: ['điện thoại', 'pc-máy tính đồng bộ', 'laptop & macbook', 'đồng hồ thông minh', 'linh kiện máy tính'],
-      numberCart: 0,
-      showUser: true,
+      // numberCart: 0,
+      showUser: false,
       searchProduct: '',
 
       showList: false,
@@ -212,6 +212,8 @@ export default {
       'getProducts',
     ]),
 
+    ...mapActions(useCartStore, ['getCart']),
+
     reload() {
       location.reload();
     },
@@ -223,9 +225,11 @@ export default {
         this.$router.push({ path: '/danh-sach-san-pham/:type' })
         this.params.keyword = this.searchProduct
         await this.getProducts(this.params)
+        this.showSearches = false
       } else {
         this.params.keyword = this.searchProduct
         await this.getProducts(this.params)
+        this.showSearches = false
       }
     },
 
@@ -238,7 +242,7 @@ export default {
       } else if (value != '' && checkRoute === '/danh-sach-san-pham/:type') {
         this.onSearch()
       }
-      console.log('event: ', event.target.value);
+      // console.log('event: ', event.target.value);
     },
 
     onClickSearch() {
@@ -298,6 +302,16 @@ export default {
       this.limit_by = (this.limit_by === default_limit) ? items : default_limit;
     },
 
+    linkCart() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn')
+      const userData = localStorage.getItem('user')
+      if (isLoggedIn && userData) {
+        this.$router.push({ path: '/gio-hang' })
+      } else {
+        this.$router.push({ path: '/dang-nhap' })
+      }
+    }
+
 
   },
 
@@ -308,11 +322,31 @@ export default {
     ...mapState(useProductsStore, [
       'params',
     ]),
+    ...mapState(useCartStore, [
+      'allCart',
+      'totalCart',
+      'count'
+    ]),
+
+    totalCart() {
+      let numberCart = this.allCart
+      return numberCart.length
+    },
 
   },
 
   async created() {
-    console.log('created', this.auth);
+    try {
+      const isLoggedIn = localStorage.getItem('isLoggedIn')
+      const userData = localStorage.getItem('user')
+      if (isLoggedIn && userData) {
+        this.getCart()
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    console.log('created');
   },
 
   // mounted() {
@@ -367,6 +401,8 @@ export default {
 
 .header-left h3 {
   width: 100%;
+  font-size: 1.2rem;
+  padding-top: 8px;
   /* text-align: center; */
 }
 
@@ -536,7 +572,7 @@ export default {
   align-items: center;
   position: absolute;
   top: 4px;
-  left: 5.3px;
+  left: 25.3px;
 }
 
 .container .header-right-address-Ripple span {
