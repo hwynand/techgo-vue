@@ -85,7 +85,7 @@
                                     <li>Phí vận chuyển sẽ được tính ở trang thanh toán.</li>
                                     <li>Bạn cũng có thể nhập mã giảm giá ở trang thanh toán.</li>
                                 </ul>
-                                <router-link to="/*"><button>Thanh toán</button></router-link>
+                                <button @click="handalePay()">Thanh toán</button>
                             </div>
                         </div>
                         <div class="Policy">
@@ -157,6 +157,7 @@
 <script>
 import { mapActions, mapState } from 'pinia'
 import { useCartStore } from '@/stores/cart'
+import Swal from 'sweetalert2';
 
 export default {
     components: {
@@ -172,7 +173,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(useCartStore, ['getCart', 'addCart', 'deleteCart']),
+        ...mapActions(useCartStore, ['getCarts', 'addCart', 'deleteCart']),
         // onDiscount(data) {
         //     console.log('data');
         // },
@@ -187,7 +188,7 @@ export default {
                 console.log('update', id, cartValue);
                 const res = await this.updateCart(id, cartValue)
                 if (res.status === 200) {
-                    this.getCart()
+                    this.getCarts()
                 }
             } catch (error) {
                 console.log(error);
@@ -214,7 +215,17 @@ export default {
 
         async handaleDeleteCart(id) {
             this.deleteCart(id)
-            this.getCart()
+            this.getCarts()
+        },
+
+        handalePay() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn')
+            const userData = localStorage.getItem('user')
+            if (isLoggedIn && userData) {
+                this.$router.push({ path: '/thanh-toan' })
+            } else {
+                Swal.fire('Bạn chưa đăng nhập')
+            }
         }
 
     },
@@ -245,7 +256,7 @@ export default {
 
     async created() {
         try {
-            await this.getCart()
+            await this.getCarts()
             console.log('cartall', this.allCart);
         } catch (error) {
             console.log(error);

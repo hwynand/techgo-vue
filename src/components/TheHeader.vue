@@ -64,13 +64,17 @@
               <span class="header-right-span user-span">
                 <span>
                   <router-link to="*">
-                    Tài khoản của <i class="fa-solid fa-chevron-down "></i>
-                    <p class="text-user">{{ auth.user.firstname }} {{ auth.user.lastname }}</p>
+                    Tài khoản của
+                    <p class="text-user">{{ auth.user.firstname }} {{ auth.user.lastname }}
+                      <span>
+                        <i class="fa-solid fa-chevron-down "></i>
+                      </span>
+                    </p>
                   </router-link>
                 </span>
               </span>
             </button>
-            <div class="log-out">
+            <div class=" log-out">
               <ul>
                 <router-link to="*">
                   <li>Thông tin tài khoản</li>
@@ -82,13 +86,15 @@
             </div>
           </div>
           <div class="header-right-cart">
-            <button class="header-right-cart-btn" @click="linkCart()">
-              <span><i class="fa-solid fa-cart-shopping"></i></span>
-              <span class="header-right-span">
-                <span>Giỏ hàng</span>
-                <span class="coutCart">{{ count }}</span>
-              </span>
-            </button>
+            <router-link to="/gio-hang">
+              <button class="header-right-cart-btn">
+                <span><i class="fa-solid fa-cart-shopping"></i></span>
+                <span class="header-right-span">
+                  <span>Giỏ hàng</span>
+                  <span class="coutCart">{{ count }}</span>
+                </span>
+              </button>
+            </router-link>
           </div>
         </div>
       </div>
@@ -212,7 +218,7 @@ export default {
       'getProducts',
     ]),
 
-    ...mapActions(useCartStore, ['getCart']),
+    ...mapActions(useCartStore, ['getCarts']),
 
     reload() {
       location.reload();
@@ -302,17 +308,6 @@ export default {
       this.limit_by = (this.limit_by === default_limit) ? items : default_limit;
     },
 
-    linkCart() {
-      const isLoggedIn = localStorage.getItem('isLoggedIn')
-      const userData = localStorage.getItem('user')
-      if (isLoggedIn && userData) {
-        this.$router.push({ path: '/gio-hang' })
-      } else {
-        this.$router.push({ path: '/dang-nhap' })
-      }
-    }
-
-
   },
 
   computed: {
@@ -340,7 +335,7 @@ export default {
       const isLoggedIn = localStorage.getItem('isLoggedIn')
       const userData = localStorage.getItem('user')
       if (isLoggedIn && userData) {
-        this.getCart()
+        this.getCarts()
       }
     } catch (error) {
       console.log(error);

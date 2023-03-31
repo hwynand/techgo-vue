@@ -16,7 +16,7 @@ export default {
   },
   methods: {
     ...mapActions(useUsersStore, ['login']),
-    ...mapActions(useCartStore, ['getCart']),
+    ...mapActions(useCartStore, ['getCarts']),
 
     isEmailValid() {
       const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
@@ -51,7 +51,7 @@ export default {
         console.log('res', res);
         if (res.status === 200) {
           this.$router.push({ path: '/' })
-          this.getCart()
+          this.getCarts()
         }
       } catch (error) {
         this.wrongEmail = true;

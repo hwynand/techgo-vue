@@ -26,7 +26,7 @@ export const useCartStore = defineStore('cart', {
                 const res = await authApi.post('/cart/items/me', cartValue)
                 if (res.status === 200) {
                     this.cartValue = res.data
-                    this.getCart()
+                    this.getCarts()
                 }
                 // console.log('addCart', res);
             } catch (error) {
@@ -34,7 +34,7 @@ export const useCartStore = defineStore('cart', {
             }
         },
 
-        async getCart() {
+        async getCarts() {
             try {
                 const res = await authApi.get('/cart/items/me/')
                 if (res.status === 200) {
