@@ -42,7 +42,7 @@
               <div class="product-price">
                 <span class="span-price">Giá:</span>
                 <span class="span-number">{{ onDiscount }}</span>
-                <!-- <span style="text-decoration: line-through;">{{ formatOldPrice(data) }}</span> -->
+                <!-- <span style="text-decoration: line-through;">{{ formatOldPrice() }}</span> -->
                 <!-- <span class="span-sale">- {{ (data.sale) * 100 }}%</span> -->
               </div>
               <div class="product-color">
@@ -64,7 +64,7 @@
               </div>
               <div class="product-btn">
                 <button id="liveToastBtn" class="btn btn-3" @click="AddCart()">Thêm vào giỏ</button>
-                <button class="product-btn-buy btn btn-3">Mua ngay</button>
+                <button class="product-btn-buy btn btn-3" @click="BuyNow()">Mua ngay</button>
               </div>
               <div class="product-item-i">
                 <span>Chia sẻ: </span>
@@ -199,13 +199,7 @@ export default {
       index: 0,
       visible: false,
       data: {
-        // name: "Smart Tivi NanoCell LG 4K 50 inch 50NANO86TPA",
-        soldold: "Còn hàng",
-        vendor: "LG",
-        old_price: "24900000",
-        price: "20850000",
         sale: 0.16,
-        colors: [],
         image_link: [
           "//product.hstatic.net/200000516791/product/product_28_1_5043e2df20164cd1a4dbca5bb832937f_178c708a80114db18ee385c6f26fa0eb_master.png",
           "//product.hstatic.net/200000516791/product/product_23_2_4935dd9b12f34816a287d5453a9be876_1375950e93174ff09f60f8169ce733da_master.png",
@@ -251,7 +245,7 @@ export default {
     },
 
     formatOldPrice() {
-      let oldPrice = data.old_price
+      let oldPrice = 1
       return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(oldPrice);
     },
 
@@ -315,6 +309,23 @@ export default {
 
       } catch (error) {
         console.log(error);
+      }
+    },
+
+    BuyNow() {
+      let index = this.currentIndex;
+      let inventory = this.detailProduct.product_variants[index].inventory
+
+      // const checkAut = this.checkLoggedIn()
+      const isLoggedIn = localStorage.getItem('isLoggedIn')
+      const userData = localStorage.getItem('user')
+      if (!isLoggedIn && !userData) {
+        this.$router.push({ path: '/dang-nhap' })
+      } else if (inventory > 0) {
+        this.AddCart()
+        this.$router.push({ path: '/gio-hang' })
+      } else {
+        Swal.fire('Sản phẩm hết hàng')
       }
     },
 
