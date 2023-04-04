@@ -61,8 +61,9 @@ export const useProductsStore = defineStore('products', {
     newCollectionProducts: [] as Product[],
     highEndProducts: [] as Product[],
     allBrand: [] as Brand[],
+    allCategory: [] as Category[],
     params: {} as ParamsGetProduct,
-    detailProduct: [] as Product[]
+    detailProduct: [] as Product[],
   }),
 
   actions: {
@@ -93,6 +94,16 @@ export const useProductsStore = defineStore('products', {
         const res = await api.get('/brands/')
         if (res.status === 200) {
           this.allBrand = res.data
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getCategorys(params: ParamsGetProduct) {
+      try {
+        const res = await api.get('/categories/', { params })
+        if (res.status === 200) {
+          this.allCategory = res.data
         }
       } catch (error) {
         console.log(error);

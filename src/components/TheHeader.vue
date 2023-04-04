@@ -59,24 +59,24 @@
           </div>
           <!-- ------------------------------show khi user đã đăng nhập---------------------------------- -->
           <div class="header-right-account" v-else>
-            <button class="header-right-account-btn user-login">
-              <span><i class="fa-regular fa-circle-user"></i></span>
-              <span class="header-right-span user-span">
-                <span>
-                  <router-link to="*">
+            <div v-click-outside="outsideLogOut">
+              <button class="header-right-account-btn user-login" @click="showLogOut()">
+                <span><i class="fa-regular fa-circle-user"></i></span>
+                <span class="header-right-span user-span">
+                  <span>
                     Tài khoản của
                     <p class="text-user">{{ auth.user.firstname }} {{ auth.user.lastname }}
                       <span>
                         <i class="fa-solid fa-chevron-down "></i>
                       </span>
                     </p>
-                  </router-link>
+                  </span>
                 </span>
-              </span>
-            </button>
-            <div class=" log-out">
+              </button>
+            </div>
+            <div class=" log-out" v-if="isShowLogOut">
               <ul>
-                <router-link to="*">
+                <router-link to="/thong-tin">
                   <li>Thông tin tài khoản</li>
                 </router-link>
                 <li @click="handleLogOut()">
@@ -122,9 +122,9 @@
                 <a>Laptop Macbook </a>
                 <span><i class="fa-solid fa-angle-right"></i></span>
               </li>
-              <ul v-for="(items, index) in items" :key="index">
+              <ul v-for="(items, index) in allCategory" :key="index">
                 <li class="items-plus" v-if="index < limit_by">
-                  {{ items }}
+                  {{ items.name }}
                 </li>
               </ul>
               <li class="show-more-less" @click="simple_toggle(default_limit, items.length)">{{
@@ -178,7 +178,7 @@ import { useUsersStore } from '@/stores/users'
 import { useProductsStore } from '@/stores/products'
 import { useCartStore } from '@/stores/cart'
 
-import { items, item_title, listElectric, listMacbook, listCategory } from '../share/Data.js';
+import { items, item_title, listElectric, listMacbook } from '../share/Data.js';
 import ListTechgo from './TheHeaderListTechgo.vue';
 import ListElectric from './TheHeaderListElectric.vue';
 import ListMacbook from './TheHeaderListMacbook.vue';
@@ -206,9 +206,9 @@ export default {
       item_title: item_title,
       listElectric: listElectric,
       listMacbook: listMacbook,
-      listCategory: listCategory,
       default_limit: 9,
       limit_by: 9,
+      isShowLogOut: false,
     }
   },
   methods: {
@@ -216,6 +216,7 @@ export default {
 
     ...mapActions(useProductsStore, [
       'getProducts',
+      'getCategorys',
     ]),
 
     ...mapActions(useCartStore, ['getCarts']),
@@ -261,7 +262,6 @@ export default {
 
     handleLogOut() {
       this.logout()
-      this.reload()
     },
 
     onClickOutside() {
@@ -308,6 +308,14 @@ export default {
       this.limit_by = (this.limit_by === default_limit) ? items : default_limit;
     },
 
+    showLogOut() {
+      this.isShowLogOut = !this.isShowLogOut;
+    },
+
+    outsideLogOut() {
+      this.isShowLogOut = false;
+    }
+
   },
 
   computed: {
@@ -316,6 +324,7 @@ export default {
     ]),
     ...mapState(useProductsStore, [
       'params',
+      'allCategory',
     ]),
     ...mapState(useCartStore, [
       'allCart',
@@ -337,12 +346,17 @@ export default {
       if (isLoggedIn && userData) {
         this.getCarts()
       }
+
+      this.getCategorys()
+
     } catch (error) {
       console.log(error);
     }
 
     console.log('created');
   },
+
+
 
   // mounted() {
   //   this.reload()
@@ -631,7 +645,6 @@ a {
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   color: #2c3e50;
   background: white;
-  display: none;
 }
 
 .log-out li {
@@ -656,9 +669,9 @@ a {
   color: white;
 }
 
-.header-right-account:hover .log-out {
+/* .header-right-account:hover .log-out {
   display: inline-block;
-}
+} */
 
 .header-right-account-btn {
   background-color: transparent;
@@ -707,6 +720,7 @@ a {
   width: 230px;
   font-size: 14px;
   color: #3d3d3d;
+  text-transform: capitalize;
 }
 
 .content-left-items li a {

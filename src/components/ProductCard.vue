@@ -272,7 +272,7 @@ export default {
     },
 
     created() {
-
+        console.log('price', this.price);
     }
 }
 </script>
@@ -787,5 +787,10 @@ export default {
 :deep(.v-overlay__content) {
     width: 60vw !important;
     max-height: none !important;
+}
+
+:deep(.v-carousel-item .v-img) {
+    max-width: 80% !important;
+    margin: auto;
 }
 </style>

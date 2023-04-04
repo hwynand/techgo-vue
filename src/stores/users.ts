@@ -56,6 +56,10 @@ export const useUsersStore = defineStore('users', {
       }
       return res
     },
+    async updateProfile({ data }) {
+      const res = await authApi.put('/users/me', data)
+      return res
+    },
     checkLoggedIn() {
       const isLoggedIn = localStorage.getItem('isLoggedIn')
       const userData = localStorage.getItem('user')

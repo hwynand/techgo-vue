@@ -157,6 +157,7 @@
 <script>
 import { mapActions, mapState } from 'pinia'
 import { useCartStore } from '@/stores/cart'
+import { useOderStore } from '@/stores/oders'
 import Swal from 'sweetalert2';
 
 export default {
@@ -174,9 +175,7 @@ export default {
     },
     methods: {
         ...mapActions(useCartStore, ['getCarts', 'addCart', 'deleteCart']),
-        // onDiscount(data) {
-        //     console.log('data');
-        // },
+        ...mapActions(useOderStore, ['addOder']),
 
         async onClickPlus(cart) {
             try {
@@ -195,16 +194,20 @@ export default {
             }
         },
 
-        onClickMinus(cart, id) {
-            console.log(cart, id);
-            // const price = cart.product_variant.price
-            // const qty = cart.qty
-            // if (this.numberCart <= 0) {
-            //     alert('aaaa')
-            // } else {
-            //     this.numberCart = this.numberCart - 1
-            //     console.log(index);
-            // }
+        async onClickMinus(cart) {
+            try {
+                const id = cart.id
+                const cartValue = {
+                    product_variant_id: cart.product_variant.id,
+                    qty: cart.qty -= 1
+                }
+                const res = await this.updateCart(id, cartValue)
+                if (res.status === 200 && this.numberCart > 0) {
+                    this.getCarts()
+                }
+            } catch (error) {
+                console.log(error);
+            }
         },
 
         formatPrice(price, qty) {
@@ -226,7 +229,7 @@ export default {
             } else {
                 Swal.fire('Bạn chưa đăng nhập')
             }
-        }
+        },
 
     },
 

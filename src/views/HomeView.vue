@@ -5,7 +5,8 @@
       <div class="baner-up">
         <div class="home-baner-left">
           <div class="baner-img">
-            <HomeBannerImageVue v-for="(url, i) in bannerUrlsLeft" :key="i" :url="url"></HomeBannerImageVue>
+            <HomeBannerImageVue v-for="(url, i) in bannerUrlsLeft" :key="i" :url="url" @click="navigationListProducts()">
+            </HomeBannerImageVue>
           </div>
         </div>
         <!-- --------------------------------------------------------------->
@@ -18,7 +19,8 @@
         <div class="home-baner-right">
           <div class="home-baner-right-img">
             <div>
-              <HomeBannerImageVue v-for="(url, i) in bannerUrlsRight" :key="i" :url="url"></HomeBannerImageVue>
+              <HomeBannerImageVue v-for="(url, i) in bannerUrlsRight" :key="i" :url="url"
+                @click="navigationListProducts()"></HomeBannerImageVue>
             </div>
           </div>
         </div>
@@ -26,7 +28,8 @@
       <!-- ---------------------------baner down------------------------------------ -->
       <div class="baner-bottom">
         <div class="baner-bottom-img">
-          <HomeBannerImageVue v-for="(url, i) in bannerUrlsBottom" :key="i" :url="url"></HomeBannerImageVue>
+          <HomeBannerImageVue v-for="(url, i) in bannerUrlsBottom" :key="i" :url="url" @click="navigationListProducts()">
+          </HomeBannerImageVue>
         </div>
       </div>
 
@@ -34,8 +37,8 @@
       <div class="highlights-category">
         <h2>Danh mục nổi bật</h2>
         <div class="category-item">
-          <HomeCategoryCardVue v-for="(category, i) in listCategory" :key="i" :url="category.url"
-            :categotyTitles="category.title"></HomeCategoryCardVue>
+          <HomeCategoryCardVue v-for="(category, i) in allCategory" :key="i" :url="category.image"
+            :categotyTitles="category.name" @click="filterCategoty(category.id)"></HomeCategoryCardVue>
         </div>
       </div>
       <!-- --------------------------------------------------------------->
@@ -50,7 +53,7 @@
                   <v-slide-group-item v-for="(products, i) in data" :key="i" v-slot="{ isSelected, toggle }">
                     <v-card class="ma-4" width="228" @click="toggle">
                       <ProductCardVue :url="products.product_variants[0].images[0].image_path" :name="products.name"
-                        :brand="products.brand.name">
+                        :brand="products.brand.name" :price="products.product_variants[0]?.price" :id="products.id">
                       </ProductCardVue>
                     </v-card>
                   </v-slide-group-item>
@@ -66,7 +69,7 @@
         <div class="products-box-sale">
           <div class="products-items">
             <div class="top-sale">
-              <h2>Top sản phẩm khuyến mại </h2>
+              <h2>Sản phẩm khuyến mại </h2>
               <div class="time-sale">
                 <div class="time_products-sale">
                   <p>{{ timeDays }}</p>
@@ -99,7 +102,7 @@
                   <v-slide-group-item v-for="(products, i) in data" :key="i" v-slot="{ isSelected, toggle }">
                     <v-card class="ma-4" width="218" @click="toggle">
                       <ProductCardVue :url="products.product_variants[0].images[0].image_path" :name="products.name"
-                        :brand="products.brand.name">
+                        :brand="products.brand.name" :price="products.product_variants[0]?.price" :id="products.id">
                       </ProductCardVue>
                     </v-card>
                   </v-slide-group-item>
@@ -130,7 +133,6 @@ import HomeBannerImageVue from '../components/HomeBannerImage.vue'
 import HomeCategoryCardVue from '../components/HomeCategoryCard.vue'
 import HomeSlideVue from '../components/HomeSlide.vue'
 import ProductCardVue from '../components/ProductCard.vue'
-import { listCategory } from '../share/Data'
 import { api } from '../api'
 
 export default {
@@ -158,7 +160,6 @@ export default {
         "https://theme.hstatic.net/200000516791/1000880762/14/categorybanner_3_img.jpg?v=2257",
         "https://theme.hstatic.net/200000516791/1000880762/14/categorybanner_4_img.jpg?v=2257",
       ],
-      listCategory: listCategory,
       model: null,
       data: [],
       countDownToTime: new Date("Apr 22, 2023 00:00:00").getTime(),
@@ -170,7 +171,7 @@ export default {
   },
 
   computed: {
-    ...mapState(useProductsStore, ['allProducts'])
+    ...mapState(useProductsStore, ['allProducts', 'allCategory', 'params']),
   },
 
   methods: {
@@ -179,8 +180,11 @@ export default {
       'getPromotionProducts',
       'getTopSellerProducts',
       'getNewCollectionProducts',
-      'getHighEndProducts'
+      'getHighEndProducts',
+      'getCategorys',
     ]),
+
+
     getAllProducts() {
       this.getPromotionProducts()
       this.getTopSellerProducts()
@@ -206,19 +210,32 @@ export default {
       this.timesHours = remainingHours;
       this.minutes = remainingMinutes;
       this.seconds = remainingSeconds;
+    },
+
+    navigationListProducts() {
+      this.$router.push({ path: '/danh-sach-san-pham/:type' })
+    },
+
+    filterCategoty(id) {
+      this.params.category_id = id
+      this.getProducts(this.params)
+      this.$router.push({ path: '/danh-sach-san-pham/:type' })
     }
   },
 
   async created() {
-    await this.getAllProducts()
-    await this.getProducts()
     try {
+      await this.getAllProducts()
+      await this.getProducts()
+      this.params.skip = 0
+      this.params.limit = 20
+      await this.getCategorys(this.params)
+      console.log('category', this.allCategory)
       const res = await this.allProducts
       this.data = res
     } catch (error) {
       console.log(error);
     }
-
   },
   mounted() {
     setInterval(() => { this.startTimer() }, 1000);
@@ -257,6 +274,7 @@ export default {
   width: 100%;
   border-radius: 8px;
   transition: transform .2s;
+  margin-bottom: 9px;
 }
 
 .baner-img img:hover {
@@ -310,6 +328,7 @@ export default {
   display: inline-block;
   margin-top: 0.5px;
   transition: transform 0.2s;
+  margin-bottom: 7px;
 }
 
 .home-baner-right-img img:hover {
@@ -465,7 +484,7 @@ export default {
   font-weight: 600;
   margin: 0;
   padding: 12px 0;
-
+  width: 100%;
 }
 
 :deep(.top-products-sale .products-box-sale .products-items .slide-group .v-theme--light .v-slide-group .v-slide-group__prev .mdi-chevron-left::before),

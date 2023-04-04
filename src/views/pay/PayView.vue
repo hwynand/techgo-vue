@@ -45,7 +45,7 @@
                 </div>
                 <div class="step-footer">
                     <a href="">Giỏ hàng</a>
-                    <button @click="onClickShipping">Hoàn tất đơn hàng</button>
+                    <button @click="onClickShipping()">Hoàn tất đơn hàng</button>
                 </div>
             </div>
             <div class="main " v-else>
@@ -82,7 +82,7 @@
                     <p class="step-footer-p">
                         <i class="fa-regular fa-circle-question"></i> Cần hỗ trợ? <a href="">Liên hệ chúng tôi</a>
                     </p>
-                    <router-link to="/danh-sach-san-pham/:type"><button @click="onClickShipping">Tiếp tục mua
+                    <router-link to="/danh-sach-san-pham/:type"><button>Tiếp tục mua
                             hàng</button></router-link>
                 </div>
             </div>
@@ -94,7 +94,7 @@
                             <p class="pay-name">{{ oder.product_variant.name }}</p>
                             <span class="content-span">{{ oder.qty }}</span>
                         </div>
-                        <p>20,850,000₫</p>
+                        <p>{{ priceProduct(oder.product_variant.price, oder.qty) }}</p>
                     </div>
                     <div class="form_discount_add-border">
                         <div class="form_discount_add">
@@ -134,10 +134,12 @@
 import { mapActions, mapState } from 'pinia'
 import { useCartStore } from '@/stores/cart'
 import { useUsersStore } from '@/stores/users'
+import { useOderStore } from '@/stores/oders'
 export default {
     data() {
         return {
             isShowPay: false,
+            valOder: [],
         }
     },
     methods: {
@@ -147,12 +149,35 @@ export default {
         ...mapActions(useUsersStore, [
             'getProfile'
         ]),
+        ...mapActions(useOderStore, [
+            'addOder'
+        ]),
 
-        onClickShipping() {
-            this.isShowPay = true;
+        async onClickShipping() {
+            try {
+                for (let i = 0; i < this.allCart.length; i++) {
+                    const item = this.allCart[i];
+                    const newItem = {
+                        product_variant_id: item.product_variant.id,
+                        qty: item.qty,
+                        price: item.product_variant.price * item.qty,
+                    };
+                    this.valOder.push(newItem);
+                }
+                let oders = this.valOder
+                await this.addOder(oders)
+                this.isShowPay = true
+            } catch (error) {
+                console.log(error);
+            }
+
         },
         directPayment() {
             console.log('hahaha');
+        },
+        priceProduct(price, qty) {
+            let number = price * qty
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(number);
         }
     },
     computed: {

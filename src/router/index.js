@@ -48,6 +48,11 @@ const router = createRouter({
       component: () => import('../views/users/RegisterView.vue')
     },
     {
+      path: '/thong-tin',
+      name: 'register',
+      component: () => import('../views/users/InForUserView.vue')
+    },
+    {
       path: '/productcard',
       name: 'productcard',
       component: () => import('../components/ProductCard.vue')
