@@ -122,7 +122,7 @@
                 <a>Laptop Macbook </a>
                 <span><i class="fa-solid fa-angle-right"></i></span>
               </li>
-              <ul v-for="(items, index) in allCategory" :key="index">
+              <ul v-for="(items, index) in allCategory" :key="index" @click="filterCategoty(items.id)">
                 <li class="items-plus" v-if="index < limit_by">
                   {{ items.name }}
                 </li>
@@ -314,7 +314,13 @@ export default {
 
     outsideLogOut() {
       this.isShowLogOut = false;
-    }
+    },
+
+    filterCategoty(id) {
+      this.params.category_id = id
+      this.getProducts(this.params)
+      this.$router.push({ path: '/danh-sach-san-pham/:type' })
+    },
 
   },
 

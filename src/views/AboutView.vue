@@ -6,4 +6,8 @@
 :deep(#header) {
   display: none !important;
 }
+
+:deep(#footer) {
+  display: none !important;
+}
 </style>

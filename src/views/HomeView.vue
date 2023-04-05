@@ -51,7 +51,7 @@
               <v-sheet class="mx-auto" elevation="8" max-width="100%">
                 <v-slide-group v-model="model" class="pa-4" center-active show-arrows>
                   <v-slide-group-item v-for="(products, i) in data" :key="i" v-slot="{ isSelected, toggle }">
-                    <v-card class="ma-4" width="228" @click="toggle">
+                    <v-card class="ma-4" width="228">
                       <ProductCardVue :url="products.product_variants[0].images[0].image_path" :name="products.name"
                         :brand="products.brand.name" :price="products.product_variants[0]?.price" :id="products.id">
                       </ProductCardVue>
@@ -100,7 +100,7 @@
               <v-sheet class="mx-auto" elevation="8" max-width="100%">
                 <v-slide-group v-model="model" class="pa-4" center-active show-arrows>
                   <v-slide-group-item v-for="(products, i) in data" :key="i" v-slot="{ isSelected, toggle }">
-                    <v-card class="ma-4" width="218" @click="toggle">
+                    <v-card class="ma-4" width="218">
                       <ProductCardVue :url="products.product_variants[0].images[0].image_path" :name="products.name"
                         :brand="products.brand.name" :price="products.product_variants[0]?.price" :id="products.id">
                       </ProductCardVue>
@@ -119,6 +119,24 @@
           </div>
         </div>
       </div>
+
+      <!-- --------------------------------------------------------------- -->
+      <div class="new-product">
+        <h2>Bộ sưu tập mới</h2>
+        <div class="box-new-product">
+          <div class="new-product-left">
+            <img src="https://theme.hstatic.net/200000516791/1000880762/14/home_tabs_1_banner.jpg?v=2258" alt="">
+          </div>
+          <div class="new-product-right">
+            <div class="new-product-cart" v-for="(products, i) in data" :key="i">
+              <ProductCardVue :url="products.product_variants[0].images[0].image_path" :name="products.name"
+                :brand="products.brand.name" :price="products.product_variants[0]?.price" :id="products.id">
+              </ProductCardVue>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ---------------------------------------------------------------- -->
@@ -484,7 +502,7 @@ export default {
   font-weight: 600;
   margin: 0;
   padding: 12px 0;
-  width: 100%;
+  width: 46%;
 }
 
 :deep(.top-products-sale .products-box-sale .products-items .slide-group .v-theme--light .v-slide-group .v-slide-group__prev .mdi-chevron-left::before),
@@ -496,6 +514,7 @@ export default {
   margin-right: 0 !important;
   border-radius: 0;
   width: 100%;
+  cursor: pointer;
 }
 
 :deep(.card__info) {
@@ -616,6 +635,40 @@ export default {
 .add-cards {
   font-weight: 600;
   margin-right: 8px;
+}
+
+.new-product {
+  margin: 12px 32px 0 56px;
+}
+
+.new-product h2 {
+  margin-left: 10px;
+  padding: 12px;
+}
+
+.box-new-product {
+  display: flex;
+}
+
+.new-product-right {
+  display: flex;
+  width: 80%;
+  flex-wrap: wrap;
+}
+
+.new-product-left {
+  width: 20%;
+}
+
+.new-product-left img {
+  width: 100%;
+  height: 99%;
+  object-fit: initial;
+}
+
+.new-product-cart {
+  width: 20%;
+  padding: 0 8px 12px 8px;
 }
 
 

@@ -14,7 +14,8 @@
                         <!-- <li @click="selected = 'OderDetail'" :class="selected == 'OderDetail' ? 'info-color' : ''">Chi tiết
                             đơn
                             hàng</li> -->
-                        <li>Đăng xuất</li>
+                        <li @click="selected = 'UpdatePW'" :class="selected == 'UpdatePW' ? 'info-color' : ''">Đổi mật khẩu
+                        </li>
                     </ul>
                 </div>
                 <div class="user-info-right">
@@ -33,13 +34,13 @@ import { useOderStore } from '@/stores/oders';
 
 import Acount from './InForUserAccount.vue';
 import ListAdress from './InForUserAdress.vue';
-// import OderDetail from './InForUserOders.vue';
+import UpdatePW from './UpdatePassword.vue';
 
 export default {
     components: {
         Acount,
         ListAdress,
-        // OderDetail,
+        UpdatePW,
     },
 
     data() {

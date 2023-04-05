@@ -36,25 +36,24 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="items-td">
+                                    <tr class="items-td" v-for="(item, i) in valDetailOder.order_items" :key="i">
                                         <td class="bl-flex">
                                             <div class="bl-img">
-                                                <img :src="valDetailOder.order_items[0].product_variant.images[0].image_path"
-                                                    alt="">
+                                                <img :src="item.product_variant.images[0].image_path" alt="">
                                             </div>
-                                            <span class="bl-name">{{ valDetailOder.name }}</span>
+                                            <span class="bl-name">{{ item.product_variant.name }}</span>
                                         </td>
-                                        <td><span>#{{ valDetailOder.code }}</span></td>
-                                        <td><span>{{ formatPrice }}</span></td>
-                                        <td><span>{{ totalQty }}</span></td>
-                                        <td><span> {{ formatPriceTotal }}</span></td>
+                                        <td><span>#{{ item.product_variant.id }}</span></td>
+                                        <td><span>{{ formatPrice(item.product_variant.price) }}</span></td>
+                                        <td><span>{{ item.qty }}</span></td>
+                                        <td><span> {{ formatPriceTotal(item.product_variant.price, item.qty) }}</span></td>
                                     </tr>
                                 </tbody>
                             </v-table>
                             <div class="block-body">
                                 <div class="block-p">
                                     <p>Giá sản phẩm</p>
-                                    <p>{{ formatPriceTotal }}</p>
+                                    <p>{{ totalPrice }}</p>
                                 </div>
                                 <div class="block-p">
                                     <p>Giao hàng tận nơi</p>
@@ -62,7 +61,7 @@
                                 </div>
                                 <div class="block-p">
                                     <p>Tổng tiền</p>
-                                    <p>{{ formatPriceTotal }}</p>
+                                    <p>{{ totalPrice }}</p>
                                 </div>
                             </div>
                         </div>
@@ -122,23 +121,22 @@ export default {
         }
     },
     created() {
-        console.log('detailOder', this.userData);
+        console.log('detailOder', this.valDetailOder);
     },
     computed: {
-
-        formatPriceTotal() {
+        totalPrice() {
             return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(this.valDetailOder.total);
-        },
-        formatPrice() {
-            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(this.valDetailOder.order_items[0].product_variant.price);
-        },
-        totalQty() {
-            const totalQty = this.valDetailOder.order_items.reduce((acc, curr) => acc + curr.qty, 0);
-            return totalQty
         }
     },
     methods: {
-
+        formatPrice(price) {
+            let number = price
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(number);
+        },
+        formatPriceTotal(price, qty) {
+            let number = price * qty
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(number);
+        },
     }
 }
 </script>
