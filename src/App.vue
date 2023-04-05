@@ -1,12 +1,24 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { useRoute, RouterView } from 'vue-router'
 import DefaultLayout from './layouts/DefaultLayout.vue';
+import { computed } from 'vue'
+import AdminLayout from '@/layouts/AdminLayout.vue'
+
+const route = useRoute()
+
+const layout = computed(() => {
+  if (route.path.includes('admin')) {
+    return AdminLayout
+  } else {
+    return DefaultLayout
+  }
+})
 </script>
 
 <template>
-  <default-layout>
+  <component :is="layout">
     <RouterView />
-  </default-layout>
+  </component>
 </template>
 
 <style scoped></style>

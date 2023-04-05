@@ -64,24 +64,27 @@ export const useProductsStore = defineStore('products', {
     allCategory: [] as Category[],
     params: {} as ParamsGetProduct,
     detailProduct: [] as Product[],
+    totalProduct: '',
+
   }),
 
   actions: {
     async getProducts(params: ParamsGetProduct) {
       console.log('params', params);
       try {
-        const res = await api.get(`/products/`, { params })
+        const res = await api.get(`/products/?page=${params.skip}&size=${params.limit}`, { params })
         if (res.status === 200) {
-          this.allProducts = res.data
+          this.allProducts = res.data.results
+          this.totalProduct = res.data
         }
 
       } catch (e) {
         console.error(e)
       }
     },
-    async getDetailProduct({ id }) {
+    async getDetailProduct({ id }, params: ParamsGetProduct) {
       try {
-        const res = await api.get(`/products/${id}`)
+        const res = await api.get(`/products/${id}?page=${params.skip}&size=${params.limit}`)
         if (res.status === 200) {
           this.detailProduct = res.data
         }

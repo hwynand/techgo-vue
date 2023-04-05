@@ -138,8 +138,7 @@ export default {
         return {
             searchText: '',
             page: 1,
-            size: 10,
-            panel: [0, 1],
+            size: 5,
             readonly: false,
             brands: ['Apple', 'Sam sung', 'Sony', 'LG', 'Oppo', 'Lenovo', 'Nokia', 'Xiaomi'],
             menuBrand: '',
@@ -183,12 +182,10 @@ export default {
         },
 
         async updatePage(page, size) {
-            console.log('page', page, size);
-            // const skip = (page - 1) * size;
-            // const limit = size
-            // this.params.skip = skip
-            // this.params.limit = limit
+            this.params.skip = page
+            this.params.limit = size
             this.getProducts(this.params)
+            console.log(page, size);
         },
 
         async filterBrands() {
@@ -216,7 +213,8 @@ export default {
         ...mapState(useProductsStore, [
             'allProducts',
             'allBrand',
-            'params'
+            'params',
+            'totalProduct',
         ]),
 
         totalProducs() {
@@ -225,8 +223,8 @@ export default {
         },
 
         totalPages() {
-            console.log('totalPages', this.allProducts.length / this.size);
-            return Math.ceil(this.allProducts.length / this.size);
+            let tatal = this.totalProduct.total
+            return Math.ceil(tatal / this.size)
         },
 
     },
@@ -239,10 +237,11 @@ export default {
     async created() {
         //------products total------
         try {
-            // this.params.skip = this.page
-            // this.params.limit = this.size
+            this.params.skip = this.page
+            this.params.limit = this.size
             await this.getProducts(this.params)
             console.log('allProducts', this.allProducts);
+            console.log('totalProduct', this.totalProducs);
         } catch (error) {
             console.log(error);
         }

@@ -18,6 +18,11 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue')
     },
     {
+      path: '/dang-nhap-admin',
+      name: 'login-admin',
+      component: () => import('../views/admin/LoginAdminView.vue')
+    },
+    {
       path: '/danh-sach-san-pham/:type',
       name: 'list-product',
       component: () => import('../views/products/ProductListView.vue')
@@ -56,7 +61,12 @@ const router = createRouter({
       path: '/productcard',
       name: 'productcard',
       component: () => import('../components/ProductCard.vue')
-    }
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../views/AdminView.vue')
+    },
   ]
 })
 
