@@ -138,7 +138,7 @@ export default {
         return {
             searchText: '',
             page: 1,
-            size: 5,
+            size: 10,
             readonly: false,
             brands: ['Apple', 'Sam sung', 'Sony', 'LG', 'Oppo', 'Lenovo', 'Nokia', 'Xiaomi'],
             menuBrand: '',

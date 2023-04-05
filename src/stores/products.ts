@@ -82,9 +82,9 @@ export const useProductsStore = defineStore('products', {
         console.error(e)
       }
     },
-    async getDetailProduct({ id }, params: ParamsGetProduct) {
+    async getDetailProduct({ id }) {
       try {
-        const res = await api.get(`/products/${id}?page=${params.skip}&size=${params.limit}`)
+        const res = await api.get(`/products/${id}`)
         if (res.status === 200) {
           this.detailProduct = res.data
         }
