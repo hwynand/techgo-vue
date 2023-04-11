@@ -4,14 +4,14 @@
             <div class="login-box">
                 <h2>Admin Shop</h2>
                 <div class="user-box">
-                    <input type="text" name="" required="">
+                    <input type="text" name="email" required="" v-model="email">
                     <label>Email</label>
                 </div>
                 <div class="user-box">
-                    <input type="password" name="" required="">
+                    <input type="password" name="password" required="" v-model="password" @keyup.enter="singInAdmin()">
                     <label>Password</label>
                 </div>
-                <a class="user-a" href="#">
+                <a class="user-a" @click="singInAdmin">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -31,7 +31,42 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'pinia'
+import { useUsersStore } from '@/stores/users'
+import Swal from 'sweetalert2';
 export default {
+    data() {
+        return {
+            email: 'admin@admin.com',
+            password: 'adminadmin',
+        }
+    },
+    methods: {
+        ...mapActions(useUsersStore, [
+            'login'
+        ]),
+        async singInAdmin() {
+            try {
+                let email = this.email
+                let password = this.password
+                const res = await this.login({ email, password })
+                if (res.status === 200 && this.auth.user.is_admin === true) {
+                    this.$router.push({ path: '/admin' })
+                } else {
+                    Swal.fire('bạn không có quyền truy cập')
+                }
+            } catch (error) {
+                Swal.fire({
+                    title: error.response.data.detail,
+                })
+            }
+        }
+    },
+    computed: {
+        ...mapState(useUsersStore, [
+            'auth'
+        ]),
+    },
 
 }
 </script>
@@ -121,6 +156,7 @@ export default {
     width: 100%;
     border-radius: 4px;
     text-align: center;
+    cursor: pointer;
 }
 
 .login-box .user-a:hover {

@@ -1,319 +1,544 @@
 <template>
-    <div class="product-management">
-        <div class="management-box">
-            <div class="add-product" v-if="!addProduct">
-                <button @click="addProducts">Thêm sản phẩm +</button>
-            </div>
-            <div class="table-user" v-if="!showAddProduct">
-                <div class="user-title">
-                    <div class="table-title">
-                        <p class="v-title">Thông tin sản phẩm</p>
-                        <p>Giá gốc</p>
-                        <p>Giá giảm</p>
-                        <p>Trạng thái</p>
-                        <span></span>
-                    </div>
-                </div>
-                <div class="user-boder">
-                    <div class="table-content" v-for="(products, index) in collection" :key="index">
-                        <div class="table-content-name">
-                            <div class="table-content-img">
-                                <img :src="products.thumnail_image_links[0]" alt="">
+    <div class="oder-management">
+        <div class="management-box" v-if="!showDetail">
+            <div class="customer_orders">
+                <div class="customer-table-wrap">
+                    <div class="customer-table">
+                        <div class="management categoty-product">
+                            <h4>Quản Lý Sản Phẩm <i class="fa-solid fa-folder-open"></i></h4>
+                            <div class="select-category">
+                                <v-select label="Loại sản phẩm" :items="allCategory" item-title="name" item-value="id"
+                                    variant="solo" @update:modelValue="filterCategorys">
+                                </v-select>
                             </div>
-                            <p class="content-name">{{ products.name }}</p>
+                            <div class="select-category">
+                                <v-select label="Loại thương hiệu" :items="allBrand" item-title="name" item-value="id"
+                                    variant="solo" @update:modelValue="filterBrands">
+                                </v-select>
+                            </div>
+                            <div class="add-product">
+                                <AddProductView :allCategory="allCategory" :allBrand="allBrand" :dialog="dialog">
+                                </AddProductView>
+                            </div>
                         </div>
-                        <p>{{ products.old_price }}</p>
-                        <p>{{ products.price }}</p>
-                        <p :class="[products.soldold == 'Còn hàng' ? 'soldoldGrenn' : 'soldoldRed']">
-                            {{ products.soldold }}
-                        </p>
-                        <div class="v-row">
-                            <span @click="editClick"><i class="fa-solid fa-pen-to-square"></i></span>
-                            <span><i class="fa-solid fa-trash"></i></span>
+                        <div class="table-margin">
+                            <v-table>
+                                <thead>
+                                    <tr>
+                                        <th class="text-left items-img">
+                                            Sản phẩm
+                                            <span class="total-products">{{ productTotal }}</span>
+                                        </th>
+                                        <th class="text-left">
+                                            Mã sản phẩm
+                                        </th>
+                                        <th class="text-left">
+                                            Thuộc tính
+                                        </th>
+                                        <th class="text-left">
+                                            Tổng tồn kho
+                                        </th>
+                                        <th class="text-left">
+                                            Giá tiền
+                                        </th>
+                                        <th class="text-left"></th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="items-td" v-for="item in allProducts" :key="item.name">
+                                        <td @click="handaleDetailProduct(item.id)">
+                                            <div class="bl-flex">
+                                                <div class="box-img">
+                                                    <img :src="item.product_variants[0]?.images?.[0].image_path" alt="">
+                                                </div>
+                                                <span class="bl-name">{{ item.name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>---</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.product_variants.length }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ totalInventoProducVanriants(item) }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ formatPrice(item.product_variants[0]?.price) }}</span>
+                                        </td>
+                                        <td class="item-delete">
+                                            <span @click="editProduct(item)"><i
+                                                    class="fa-solid fa-pen-to-square"></i></span>
+                                            <span @click="handleDeleteProduct(item.id)"><i
+                                                    class="fa-solid fa-trash"></i></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </v-table>
+                            <div class="text-center">
+                                <v-pagination v-model="page" :length="totalPages" rounded="circle"
+                                    @update:modelValue="updatePage(page, size)">
+                                </v-pagination>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="title">
-                    <h3>Table ProductManagement</h3>
-                </div>
-                <div class="text-center">
-                    <v-pagination v-model="page" :length="4" rounded="circle"></v-pagination>
-                    <button class="btn btn-primary" v-for="p in pagination.pages" :key="p" @click.prevent="setPage(p)">{{ p
-                    }}</button>
-                </div>
-            </div>
-            <div class="AddProductAdm" v-if="showAddProduct">
-                <AddProductAdm @handleClose="clickClose"></AddProductAdm>
             </div>
         </div>
+
+        <!-- ---------------------------deital product------------------------------------- -->
+        <div class="management-box" v-else>
+            <div class="customer_orders">
+                <div class="customer-table-wrap" v-if="!showCreateProductVariants">
+                    <div class="customer-table">
+                        <div class="management">
+                            <h4>Chi tiết</h4>
+                            <span @click="handaleComebackProduct"> <i class="fa-solid fa-angles-right"></i> Quay lại trang
+                                sản phẩm</span>
+                        </div>
+                        <div class="add-btn">
+                            <button @click="addProductVariants()">Thêm sản phẩm <i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        <div class="table-margin">
+                            <v-table>
+                                <thead>
+                                    <tr>
+                                        <th class="text-left items-img">
+                                            Sản phẩm
+                                        </th>
+                                        <th class="text-left">
+                                            SKU
+                                        </th>
+                                        <th class="text-left">
+                                            Thuộc tính
+                                        </th>
+                                        <th class="text-left">
+                                            Tồn kho
+                                        </th>
+                                        <th class="text-left">
+                                            Giá tiền
+                                        </th>
+                                        <th class="text-left">
+                                            Trạng thái
+                                        </th>
+                                        <th class="text-left"></th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="items-td" v-for="item in detailProductVariants" :key="item.name">
+                                        <td>
+                                            <div class="bl-flex">
+                                                <div class="box-img">
+                                                    <img :src="item.images[0]?.image_path" alt="">
+                                                </div>
+                                                <span class="bl-name">{{ item.name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.sku }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.color }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.inventory }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.price }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.inventory ? 'Còn hàng' : 'Hết hàng' }}</span>
+                                        </td>
+                                        <td class="item-delete">
+                                            <span @click="handleEditProductVariant(item.id)"><i
+                                                    class="fa-solid fa-pen-to-square"></i></span>
+                                            <span @click="handleDeleteProductVariants(item.id)"><i
+                                                    class="fa-solid fa-trash"></i></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </v-table>
+                        </div>
+                    </div>
+                </div>
+                <div v-else>
+                    <ProductVariantsView :id="idProduct" :showCreateProductVariants="showCreateProductVariants"
+                        :valProductVariant="valProductVariant" @handaleClose="close()">
+                    </ProductVariantsView>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
 <script>
-import _ from 'lodash';
-import AddProductAdm from './AddProductView.vue';
+import { mapActions, mapState } from 'pinia'
+import { useProductsStore } from '@/stores/products'
+import AddProductView from './AddProductView.vue'
+import ProductVariantsView from './ProductVariantsCreateView.vue'
 export default {
+    props: {
+        allProducts: {
+            type: Object,
+            required: true,
+        },
+    },
     components: {
-        AddProductAdm
+        AddProductView,
+        ProductVariantsView,
     },
     data() {
         return {
-            dialog: false,
-            addProduct: false,
-            showAddProduct: false,
             page: 1,
-            perPage: 1,
-            pagination: {},
-            products: [
-                {
-                    name: "Smart Tivi NanoCell LG 4K 50 inch 50NANO86TPA",
-                    soldold: "Còn hàng",
-                    vendor: "LG",
-                    old_price: "24,900,000đ",
-                    price: "20,916,000đ",
-                    sale: 0.16,
-                    colors: [],
-                    image_link: [
-                        "//product.hstatic.net/200000516791/product/product_28_1_5043e2df20164cd1a4dbca5bb832937f_178c708a80114db18ee385c6f26fa0eb_master.png",
-                        "//product.hstatic.net/200000516791/product/product_23_2_4935dd9b12f34816a287d5453a9be876_1375950e93174ff09f60f8169ce733da_master.png",
-                        "//product.hstatic.net/200000516791/product/product_23_3_e6936a60b48144ceaad1f53a59872d4a_3f238840af0347e7878d2cecef17a53d_master.png",
-                        "//product.hstatic.net/200000516791/product/product_27_3_b64ab2ee0acc4c248b7d6c177663bc12_6dff7c9a80db4d77854643f9eafe18d6_master.png"
-                    ],
-                    thumnail_image_links: [
-                        "//product.hstatic.net/200000516791/product/product_28_1_5043e2df20164cd1a4dbca5bb832937f_178c708a80114db18ee385c6f26fa0eb_compact.png",
-                        "//product.hstatic.net/200000516791/product/product_23_2_4935dd9b12f34816a287d5453a9be876_1375950e93174ff09f60f8169ce733da_compact.png",
-                        "//product.hstatic.net/200000516791/product/product_23_3_e6936a60b48144ceaad1f53a59872d4a_3f238840af0347e7878d2cecef17a53d_compact.png",
-                        "//product.hstatic.net/200000516791/product/product_27_3_b64ab2ee0acc4c248b7d6c177663bc12_6dff7c9a80db4d77854643f9eafe18d6_compact.png"
-                    ],
-                    description_detail: "<div class=\"description-productdetail\">\n\t\t\t\t\t\t\t\t<p><strong>Đặc điểm nổi bật</strong></p><ul><li><p>Tivi NanoCell LG 4K (3840 x 2160) hiển thị hình ảnh sắc nét, chi tiết</p></li><li><p>Công nghệ NanoCell giúp hình ảnh có màu sắc thuần khiết và tinh tế hơn</p></li><li><p>Bộ xử lý α7 Gen4 Processor 4K phân tích và tối ưu hóa nội dung hiển thị</p></li><li><p>FILMMAKER MODE™ truyền tải phim chân thực như dưới góc nhìn đạo diễn</p></li><li><p>Công nghệ Dolby Atmos mang đến không gian âm thanh vòm sống động</p></li><li><p>Công nghệ AI Sound tinh chỉnh âm thanh dựa trên thể loại nội dung đang xem</p></li><li><p>Tivi LG hỗ trợ tìm kiếm bằng giọng nói giúp tìm kiếm nội dung tiện lợi hơn</p></li></ul><div> </div><h2>Thông số sản phẩm</h2><table id=\"tblGeneralAttribute\" border=\"1\" cellspacing=\"0\" style=\"background-color:#ffffff; border-collapse:collapse; border-spacing:0px; border:1px solid #eeeeee; box-sizing:border-box; color:#333333; font-family:Roboto,sans-serif; font-size:13px; line-height:20px; margin-bottom:20px; max-width:100%; min-width:500px; width:100%\" class=\"mce-item-table table table-bordered\"><tbody style=\"box-sizing: border-box;\"><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Model</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\"><table><tbody><tr><td><table><tbody><tr><td>50NANO86TPA</td></tr></tbody></table></td></tr></tbody></table></td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\"><table><tbody><tr><td>Nhà sản xuất</td></tr></tbody></table></td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">LG</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\"><table><tbody><tr><td>Xuất xứ</td></tr></tbody></table></td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">Indonesia</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Năm ra mắt</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">2021</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Thời gian bảo hành</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">24 tháng</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Loại Tivi</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">Tivi NanoCell</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Kích thước màn hình</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">50 inch</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Độ phân giải</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">4K (3840 x 2160) Pixels</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Công nghệ xử lí hình ảnh</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">X1 4K Processor, Direct LED Frame Dimming, HLG, Motionflow XR 200, HDR10, Auto Mode, 4K X-Reality PRO</td></tr></tbody></table>\n\t\t\t\t\t\t\t</div>"
-                },
-                {
-                    name: "Google Tivi Sony 4K 50 inch KD-50X80J/S VN3",
-                    soldold: "Hết hàng",
-                    vendor: "Sony",
-                    price: "19,250,000₫",
-                    old_price: "21,500,000₫",
-                    colors: [],
-                    image_link: [
-                        "//product.hstatic.net/200000516791/product/product_8_1_40a8adab1068450fa2c5193e55c449db_d2eb31bffb6f40f4a7990c5383cc235b_master.png",
-                        "//product.hstatic.net/200000516791/product/product_8_3_de5aa5a17f7941e19996b5e52e091ebc_53258e65e61f43ae840b978a94744d23_master.png",
-                        "//product.hstatic.net/200000516791/product/product_8_2_cdfa4e6e1fac41dbb9b9e29f433a5cf4_5fae594f6bfc409aae61492b905e6e9e_master.png",
-                        "//product.hstatic.net/200000516791/product/product_8_4_796f81fdeeb34b71830ed1476593fb3c_f9aff1fcfca8487d9a510e6356a08ad5_master.png"
-                    ],
-                    thumnail_image_links: [
-                        "//product.hstatic.net/200000516791/product/product_8_1_40a8adab1068450fa2c5193e55c449db_d2eb31bffb6f40f4a7990c5383cc235b_compact.png",
-                        "//product.hstatic.net/200000516791/product/product_8_3_de5aa5a17f7941e19996b5e52e091ebc_53258e65e61f43ae840b978a94744d23_compact.png",
-                        "//product.hstatic.net/200000516791/product/product_8_2_cdfa4e6e1fac41dbb9b9e29f433a5cf4_5fae594f6bfc409aae61492b905e6e9e_compact.png",
-                        "//product.hstatic.net/200000516791/product/product_8_4_796f81fdeeb34b71830ed1476593fb3c_f9aff1fcfca8487d9a510e6356a08ad5_compact.png"
-                    ],
-                    description_detail: "<div class=\"description-productdetail\">\n\t\t\t\t\t\t\t\t<p><strong>Đặc điểm nổi bật</strong></p><ul><li><p>Tivi Sony có độ phân giải 4K hiển thị hình ảnh sắc nét gấp 4 lần Full HD</p></li><li><p>Công nghệ 4K X-Reality PRO tự động nâng cấp hình ảnh lên 4K sắc nét</p></li><li><p>Công nghệ Triluminos Pro tái hiện dải màu rộng, màu sắc rực rỡ, tự nhiên</p></li><li><p>Cảnh hành động nhanh mượt mà hơn nhờ công nghệ Motionflow XR 800</p></li><li><p>Thiết kế loa bất đối xứng X-Balanced Speaker cho âm thanh chất lượng cao</p></li><li><p>Công nghệ Room compensation tối ưu hóa âm thanh trong phòng theo vị trí ngồi</p></li><li><p>Chia sẻ nội dung từ điện thoại lên màn hình TV qua Chromecast, Apple Airplay</p></li></ul><div> </div><h2>Thông số sản phẩm</h2><table id=\"tblGeneralAttribute\" border=\"1\" cellspacing=\"0\" style=\"background-color:#ffffff; border-collapse:collapse; border-spacing:0px; border:1px solid #eeeeee; box-sizing:border-box; color:#333333; font-family:Roboto,sans-serif; font-size:13px; line-height:20px; margin-bottom:20px; max-width:100%; min-width:500px; width:100%\" class=\"mce-item-table table table-bordered\"><tbody style=\"box-sizing: border-box;\"><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Model</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\"><table><tbody><tr><td><table><tbody><tr><td>KD-50X80J/S</td></tr></tbody></table></td></tr></tbody></table></td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\"><table><tbody><tr><td>Nhà sản xuất</td></tr></tbody></table></td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">Sony</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\"><table><tbody><tr><td>Xuất xứ</td></tr></tbody></table></td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">Malaysia</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Năm ra mắt</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">2021</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Thời gian bảo hành</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">24 tháng</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Loại Tivi</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\"><table><tbody><tr><td>4K HDR GoogleTV</td></tr></tbody></table></td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Kích thước màn hình</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">43 inch</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Độ phân giải</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">4K (3840 x 2160) Pixels</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Công nghệ xử lí hình ảnh</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">X1 4K Processor, Direct LED Frame Dimming, HLG, Motionflow XR 200, HDR10, Auto Mode, 4K X-Reality PRO</td></tr></tbody></table>\n\t\t\t\t\t\t\t</div>"
-                },
-            ]
+            size: 10,
+            showDetail: false,
+            showCreateProductVariants: false,
+            idProduct: null,
+            dialog: false,
+            valueEditProductVariants: {},
+            valProductVariant: {},
         }
     },
-    methods: {
-        // formatOldPrice(index) {
-        //     let oldPrice = this.products[index].old_price
-        //     return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(oldPrice);
-        // },
-        // formatPrice(index) {
-        //     let Price = this.products[index].price
-        //     return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(Price);
-        // },
-        addProducts() {
-            this.showAddProduct = true;
-            this.addProduct = true;
-        },
-        clickClose() {
-            this.showAddProduct = false;
-            this.addProduct = false;
-        },
-        editClick() {
-            this.showAddProduct = true;
-            this.addProduct = true;
-        },
 
-        setPage(p) {
-            this.pagination = this.paginator(this.products.length, p);
+    methods: {
+        ...mapActions(useProductsStore, [
+            'getProducts',
+            'getProductVariants',
+            'deleteProduct',
+            'deleteProductVariants',
+            'getProductVariant',
+        ]),
+        filterBrands(id) {
+            this.params.brand_id = id
+            this.getProducts(this.params)
         },
-        paginate(data) {
-            return data.slice(this.pagination.startIndex, this.pagination.endIndex + 1)
+        filterCategorys(id) {
+            this.params.category_id = id
+            this.getProducts(this.params)
         },
-        paginator(totalItems, currentPage) {
-            let startIndex = (currentPage - 1) * this.perPage
-            let endIndex = Math.min(startIndex + this.perPage - 1, totalItems - 1);
-            return {
-                currentPage: currentPage,
-                startIndex: startIndex,
-                endIndex: endIndex,
-                pages: _.range(1, Math.ceil(totalItems / this.perPage) + 1)
-            };
+        formatPrice(price) {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(price)
+        },
+        totalInventoProducVanriants(item) {
+            let totalInventory = 0;
+            for (let i = 0; i < item.product_variants.length; i++) {
+                totalInventory += item.product_variants[i].inventory;
+            }
+            return totalInventory
+        },
+        handaleDetailProduct(id) {
+            this.idProduct = id
+            this.getProductVariants(id)
+            this.showDetail = true
+        },
+        handaleComebackProduct() {
+            this.showDetail = false
+        },
+        addProductVariants() {
+            this.showCreateProductVariants = true
+        },
+        async updatePage(page, size) {
+            try {
+                this.params.skip = page
+                this.params.limit = size
+                await this.getProducts(this.params)
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        close() {
+            this.showCreateProductVariants = false
+            this.valProductVariant = ''
+        },
+        async handleDeleteProductVariants(idVariant) {
+            try {
+                let product_id = this.idProduct
+                let variant_id = idVariant
+                await this.deleteProductVariants(product_id, variant_id)
+                await this.getProductVariants(product_id)
+            } catch (error) {
+                console.log(error);
+            }
+
+        },
+        async handleDeleteProduct(id) {
+            try {
+                await this.deleteProduct(id)
+                this.params.skip = this.page
+                this.params.limit = this.size
+                await this.getProducts(this.params)
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        editProduct(item) {
+            console.log(item, 'item');
+        },
+        async handleEditProductVariant(idVariant) {
+            try {
+                let idProduct = this.idProduct
+                await this.getProductVariant(idProduct, idVariant)
+                this.valProductVariant = this.detailVariant
+            } catch (error) {
+                console.log(error);
+            }
+            this.showCreateProductVariants = true
         }
     },
 
     computed: {
-        collection() {
-            return this.paginate(this.products);
+        ...mapState(useProductsStore, [
+            'allCategory',
+            'params',
+            'totalProduct',
+            'allBrand',
+            'detailProductVariants',
+            'detailVariant',
+
+        ]),
+
+        totalPages() {
+            let number = this.totalProduct.total / this.size
+            return Math.ceil(number)
+        },
+
+        // tổng số invento của tất cả sản phẩm
+        totalInventory() {
+            let inventory = 0;
+            this.allProducts.forEach(product => {
+                product.product_variants.forEach(variant => {
+                    inventory += variant.inventory;
+                });
+            });
+            return inventory;
+        },
+        productTotal() {
+            return this.totalProduct.total
         }
     },
-    created() {
-        // this.paginate_total = this.heroes.length / this.paginate;
-        this.setPage(this.page);
-    },
+
+    async created() {
+        console.log('createdaa', this.valProductVariant);
+    }
+
 }
 </script>
 
 <style scoped>
-.table-user {
-    background-color: white;
-    color: #2c3e50;
-    padding-bottom: 18px;
-    margin-top: 28px;
-    border-radius: 12px;
+.ustomer-table {
     position: relative;
-    height: auto;
-}
-
-.user-boder {
-    border-top: 1px solid #bdc3c7;
-    padding: 0 24px;
-    padding-top: 12px;
-}
-
-.user-title {
-    padding: 0 24px;
-
-}
-
-.table-title {
-    display: flex;
-
-}
-
-.v-title {
-    width: 30% !important;
-}
-
-.table-title p {
-    width: 20%;
-    margin-top: 64px;
-    padding: 0 8px;
-}
-
-.table-title span {
-    width: 10%;
-}
-
-.table-content {
-    display: flex;
-    font-size: 0.9rem;
-}
-
-.table-content p {
-    width: 20%;
-    padding: 8px;
-}
-
-.table-content span {
-    width: 10%;
-    padding: 8px 0;
-
 }
 
 .title {
-    background-color: #0c2461;
-    color: white;
+    color: black;
     padding: 16px;
     position: absolute;
-    width: 94%;
-    top: -3%;
-    left: 3%;
+    width: 75%;
     border-radius: 10px;
-}
-
-.table-content-name {
+    top: 2%;
+    left: 20%;
     display: flex;
-    width: 30%;
-    padding: 8px 0;
+    align-items: center;
 }
 
-.table-content-img {
-    width: 20%;
+.title h3 {
+    font-size: 1.5rem;
 }
 
-.table-content-img img {
-    width: 100%;
-    padding: 4px;
+.customer-table-wrap {
+    background-color: #d9edf7;
+    padding: 8px 10px;
+    margin: 30px 0;
 }
 
-.content-name {
-    width: 80% !important;
-    padding: 0 0 0 8px !important;
-    font-weight: 500;
-    font-size: 0.8rem;
+.customer-table-wrap {
+    background-color: #d9edf7;
+    padding: 8px 10px;
+    margin: 30px 0;
 }
 
-.add-product {
-    color: white;
-    padding: 8px;
-    margin-right: 32px;
-    margin-top: 12px;
-    background-color: #0c2461;
-    width: 150px;
-    border-radius: 6px;
-    display: flex;
-    justify-content: center;
+.customer-table-wrap {
+    background-color: #d9edf7;
+    padding: 8px 10px;
+    margin: 30px 0;
 }
 
-.add-product:hover {
-    background-color: #487eb0;
+.customer-table-wrap {
+    background-color: #d9edf7;
+    padding: 8px 10px;
+    margin: 30px 0;
 }
 
-.add-product a {
-    color: white;
-    text-decoration: none;
-}
-
-.AddProductAdm {
-    margin-top: 24px;
+.customer-table {
     background-color: white;
 }
 
-.soldoldGrenn {
-    color: green;
-    font-weight: 500;
+.customer-table h4 {
+    padding: 4px 12px;
+    border-bottom: 1px solid #d9edf7;
+    color: black;
 }
 
-.soldoldRed {
-    color: red;
-    font-weight: 500;
+.text-left {
+    width: 13.333%;
+    text-align: center !important;
 }
 
-.fa-trash {
-    margin-left: 32px;
-
+.items-img {
+    width: 30%;
+    text-align: left !important;
 }
 
-.v-row {
-    display: inline;
-    margin: 0;
-    padding: 8px 0;
+.items-td td {
+    border-bottom: none !important;
+    font-size: 0.82rem;
+    margin-bottom: 12px;
+    margin-top: 6px;
+    text-align: center;
     cursor: pointer;
 }
 
-.v-row span {
-    margin-right: 12px;
+.bl-flex {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
 }
 
-.btn-primary {
-    padding: 4px;
-    background-color: #487eb0;
+.bl-flex span {
+    text-align: left !important;
+}
+
+.bl-name {
+    padding: 6px 12px;
+    margin-bottom: 30px;
+}
+
+
+.table-margin {
+    margin: 0 !important;
+}
+
+.add-btn {
     color: white;
-    margin: 4px;
+
 }
 
-::v-deep .v-pagination__list {
-    justify-content: right;
-    padding-right: 16px;
+.oder-management {
+    position: relative;
 }
+
+.select-category {
+    margin-left: 20px;
+}
+
+.select-category select {
+    outline: unset;
+}
+
+.select-category option {
+    padding: 4px;
+    width: 100%;
+}
+
+.add-btn button {
+    border: 1px solid #2980b9;
+    position: absolute;
+    padding: 4px;
+    width: 150px;
+    top: -64px;
+    border-radius: 6px;
+    background-color: #2980b9;
+}
+
+.add-btn button:hover {
+    background-color: #3498db;
+}
+
+.categoty-product {
+    justify-content: unset !important;
+}
+
+.management {
+    display: flex;
+    align-items: center;
+    color: black;
+    justify-content: space-between;
+}
+
+.management h4 {
+    margin: 0;
+}
+
+.management span {
+    margin-right: 24px;
+    color: blue !important;
+    cursor: pointer;
+}
+
+.item-delete {
+    display: flex;
+    align-items: center;
+}
+
+.item-delete i {
+    margin-right: 32px;
+}
+
+.add-product {
+    color: white !important;
+    position: absolute;
+    top: -64px;
+    left: 0;
+}
+
+.add-product button:hover {
+    background-color: #3498db;
+}
+
+.box-img {
+    width: 15%;
+    display: flex;
+}
+
+.box-img img {
+    width: 100%;
+}
+
+.total-products {
+    margin-left: 6px;
+    font-weight: bold;
+    color: #2980b9;
+}
+
+:deep(.v-table__wrapper) {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+:deep(.v-table) {
+    border-radius: 12px;
+}
+
+:deep(.v-table>.v-table__wrapper>table) {
+    margin-top: 26px;
+}
+
+.table-margin :deep(.v-table>.v-table__wrapper>table) {
+    margin-top: 0;
+}
+
+:deep(.v-pagination__list) {
+    color: black;
+}
+
+:deep(.v-select .v-field.v-field) {
+    width: 250px;
+}
+
+/* :deep(.v-table .v-table__wrapper > table > tbody > tr:not(:last-child) > td) {
+    height: unset !important;
+} */
 </style>

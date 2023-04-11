@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 
-import { api } from "../apis"
+import { api, authApi } from "../apis"
 
 interface Category {
   id: number,
   name: string,
+  image: string,
 }
 
 interface Brand {
@@ -64,8 +65,11 @@ export const useProductsStore = defineStore('products', {
     allCategory: [] as Category[],
     params: {} as ParamsGetProduct,
     detailProduct: [] as Product[],
-    totalProduct: '',
-
+    totalProduct: {},
+    // variant: {} as ProductVariant[],
+    image_path: [],
+    detailProductVariants: [],
+    detailVariant: [],
   }),
 
   actions: {
@@ -77,7 +81,6 @@ export const useProductsStore = defineStore('products', {
           this.allProducts = res.data.results
           this.totalProduct = res.data
         }
-
       } catch (e) {
         console.error(e)
       }
@@ -164,6 +167,75 @@ export const useProductsStore = defineStore('products', {
         console.error(e)
       }
     },
-
+    async addProduct({ data }) {
+      try {
+        const res = await authApi.post('/products/', data)
+        console.log('add products', res);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async deleteProduct(id: Number) {
+      try {
+        await authApi.delete(`/products/${id}`)
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async uploadImage(image: Image) {
+      try {
+        const res = await authApi.post('/product-variants/uploadfile/', image)
+        if (res.status === 200) {
+          this.image_path = res.data
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async addProductVariant(id: Number, variant: ProductVariant) {
+      try {
+        await authApi.post(`/product-variants/products/${id}/variants`, variant)
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getProductVariants(id: Number) {
+      try {
+        const res = await authApi.get(`/product-variants/products/${id}/variants`)
+        if (res.status === 200) {
+          this.detailProductVariants = res.data
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async deleteProductVariants(product_id: Number, variants_id: Number) {
+      try {
+        await authApi.delete(`/product-variants/products/${product_id}/variants/${variants_id}`)
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getProductVariant(product_id: Number, variants_id: Number) {
+      try {
+        const res = await authApi.get(`/product-variants/products/${product_id}/variants/${variants_id}`)
+        if (res.status === 200) {
+          this.detailVariant = res.data
+          console.log(this.detailVariant, 'detailVariant');
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async updateProductVariant(product_id: Number, variants_id: Number, variant: ProductVariant) {
+      try {
+        const res = await authApi.put(`/product-variants/products/${product_id}/variants/${variants_id}`, variant)
+        if (res.status === 200) {
+          console.log('updateProductVariant', res.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
   }
 })

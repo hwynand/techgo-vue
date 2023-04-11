@@ -1,189 +1,133 @@
 <template>
-    <div class="add-products">
-        <div class="add-products-content">
-            <h3>Thông tin cơ bản</h3>
-            <p>Ảnh sản phẩm</p>
-            <div class="">
-                <div class="box-image">
-                    <div class="img-product" v-for="(image, index) in images" :key="index">
-                        <img :src="image" />
-                        <button class="img-btn" @click="removeImage(index)"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                    <v-file-input :rules="rules" accept="image/png, image/jpeg, image/bmp" placeholder="Pick an avatar"
-                        prepend-icon="mdi-camera" label="Avatar" multiple @change="onFileChange"></v-file-input>
-                </div>
-                <div class="box-input box-margin">
-                    <p>Tên sản phẩm (*) :</p>
-                    <input type="text">
-                </div>
-                <div class="box-input">
-                    <p>Mã sản phẩm (*) :</p>
-                    <input type="text">
-                </div>
-                <div class="box-input">
-                    <p>Giá sản phẩm (*) :</p>
-                    <input type="number">
-                </div>
-                <div class="box-input">
-                    <p>Tình Trạng :</p>
-                    <select name="" id="">
-                        <option value="Chọn" selected disabled>Chọn</option>
-                        <option value="Còn Hàng">Còn Hàng </option>
-                        <option value="Hết hàng">Hết hàng </option>
-                    </select>
-                </div>
-                <div class="flex-btn">
-                    <button class="box-btn">Thêm mới sản phẩm</button>
-                    <button class="box-btn" @click="$emit('handleClose')">Huỷ</button>
-                </div>
-            </div>
-
-        </div>
-
+    <div>
+        <v-row justify="center">
+            <v-dialog v-model="dialog" persistent width="1024">
+                <template v-slot:activator="{ props }">
+                    <v-btn color="primary" v-bind="props">
+                        Thêm sản phẩm <i class="fa-solid fa-plus"></i>
+                    </v-btn>
+                </template>
+                <v-card>
+                    <v-card-title>
+                        <span class="text-h5">Add Product</span>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-container>
+                            <v-row>
+                                <v-col cols="12" sm="6" md="4">
+                                    <v-text-field label="Name" required variant="solo"
+                                        v-model="createProduct.name"></v-text-field>
+                                </v-col>
+                                <v-col cols="12" sm="6" md="4">
+                                    <v-select :items="allCategory" item-title="name" item-value="id" label="Categorys"
+                                        required variant="solo" v-model="createProduct.category_id"></v-select>
+                                </v-col>
+                                <v-col cols="12" sm="6" md="4">
+                                    <v-select :items="allBrand" item-title="name" item-value="id" label="Brands" required
+                                        variant="solo" v-model="createProduct.brand_id"></v-select>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-textarea label="Description..." variant="solo"
+                                        v-model="createProduct.description"></v-textarea>
+                                </v-col>
+                            </v-row>
+                        </v-container>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue-darken-1" variant="text" @click="dialog = false">
+                            Close
+                        </v-btn>
+                        <v-btn color="blue-darken-1" variant="text" @click="handaleCreteProduct()">
+                            Save
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+        </v-row>
     </div>
 </template>
 
 <script>
-
+import { mapActions, mapState } from 'pinia'
+import { useProductsStore } from '@/stores/products'
 export default {
-    components: {
-
-    },
     data() {
         return {
-            upload: null,
-            images: []
+            dialog: false,
+            createProduct: {
+                name: '',
+                category_id: '',
+                brand_id: '',
+                description: '',
+            },
+            page: 1,
+            size: 10,
+
         }
     },
     methods: {
-        onFileChange(e) {
+        ...mapActions(useProductsStore, [
+            'getBrand',
+            'getCategorys',
+            'addProduct',
+            'getProducts'
 
-            var files = e.target.files || e.dataTransfer.files;
-            if (!files.length) return;
-            this.createImage(files);
-        },
-        createImage(files) {
-            var vm = this;
-            for (var index = 0; index < files.length; index++) {
-                var reader = new FileReader();
-                reader.onload = function (event) {
-                    const imageUrl = event.target.result;
-                    vm.images.push(imageUrl);
-                }
-                reader.readAsDataURL(files[index]);
+        ]),
+        async handaleCreteProduct() {
+            try {
+                let data = this.createProduct
+                await this.addProduct({ data })
+                this.params.skip = this.page
+                this.params.limit = this.size
+                await this.getProducts(this.params)
+                this.createProduct.name = ''
+                this.createProduct.category_id = ''
+                this.createProduct.brand_id = ''
+                this.createProduct.description = ''
+                this.dialog = false;
+                console.log('name', data);
+            } catch (error) {
+                console.log(error);
             }
-        },
-        removeImage(index) {
-            this.images.splice(index, 1)
         }
     },
-    mounted() {
+    computed: {
+        ...mapState(useProductsStore, [
+            'allBrand',
+            'allCategory',
+            'params'
+        ]),
+
+    },
+
+    async created() {
+        try {
+            await this.getBrand()
+            console.log('created', this.allBrand);
+        } catch (error) {
+
+        }
 
     }
 }
 </script>
 
 <style scoped>
-.add-products {
-    color: black;
-    padding: 24px 46px 46px 46px;
+.fa-plus {
+    margin-top: 1px;
+    margin-left: 5px;
 }
 
-.img-product {
-    width: 10%;
-    padding: 12px;
-    position: relative;
+:deep(.v-row) {
+    margin: unset;
 }
 
-.img-product img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-
+:deep(.v-card-text) {
+    padding: 0px 24px 10px !important;
 }
 
-.box-image {
-    display: flex;
-    border: 1px dashed black;
-    height: 100px;
-    position: relative;
-}
-
-.img-btn {
-    position: absolute;
-    top: 0%;
-    right: 7%;
-}
-
-.box-input {
-    margin-bottom: 12px;
-    width: 70%;
-    display: flex;
-}
-
-.box-input p {
-    width: 18%;
-    padding: 4px;
-}
-
-.box-input input {
-    width: 82%;
-    border: 1px solid rgb(149, 149, 149);
-    padding: 2px 8px;
-    height: 32px;
-}
-
-.box-input input:focus {
-    outline: 1px solid #ccc;
-}
-
-.box-margin {
-    margin-top: 48px;
-}
-
-.box-input select {
-    border: 1px solid rgb(149, 149, 149);
-    width: 82%;
-    padding: 2px 8px;
-    height: 32px;
-}
-
-.add-products-content h3 {
-    margin-bottom: 12px;
-}
-
-.add-products-content p {
-    margin-bottom: 8px
-}
-
-.box-btn {
-    background-color: #0c2461;
-    padding: 8px 12px;
-    color: white;
-    border-radius: 12px;
-    margin-right: 24px;
-}
-
-.box-btn:hover {
-    background-color: #487eb0;
-}
-
-.flex-btn {
-    display: flex;
-    margin-left: 40%;
-}
-
-::v-deep .v-input__control {
-    display: none;
-}
-
-::v-deep .v-input__prepend {
-    position: absolute;
-    top: 90%;
-    left: 50%;
-}
-
-::v-deep .v-input__prepend i {
-    font-size: 2.5rem;
+:deep(.v-list-item-title) {
+    text-transform: capitalize !important;
 }
 </style>

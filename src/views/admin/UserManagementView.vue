@@ -1,187 +1,320 @@
 <template>
-    <div class="user-management">
+    <h2 class="oder-h2">Danh sách quản lí Users <i class="fa-solid fa-users"></i></h2>
+    <div class="oder-management">
         <div class="management-box">
-            <div class="table-user">
-                <div class="user-title">
-                    <div class="table-title">
-                        <p>Author</p>
-                        <p>Email</p>
-                        <p>Số điện thoại</p>
-                        <p>Ngày sinh</p>
-                        <span></span>
+            <div class="customer_orders">
+                <div class="customer-table-wrap">
+                    <div class="customer-table">
+                        <div>
+                            <v-table>
+                                <thead>
+                                    <tr>
+                                        <th class="text-left">
+                                            Tên
+                                        </th>
+                                        <th class="text-left">
+                                            Email
+                                        </th>
+                                        <th class="text-left">
+                                            Số điện thoại
+                                        </th>
+                                        <th class="text-left">
+                                            Địa chỉ
+                                        </th>
+                                        <th class=""></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="items-td" v-for="(user, index) in allUsers" :key="index">
+                                        <td class="item-code" v-if="user.firstname && user.lastname"
+                                            @click="handledetailUser(user.id)">
+                                            {{ user.firstname }} {{ user.lastname }}
+                                            <span v-if="user.firstname && user.lastname"><i
+                                                    class="fa-solid fa-eye"></i></span>
+                                        </td>
+                                        <td class="item-code" v-else>
+                                            <span>---</span>
+                                        </td>
+                                        <td>{{ user.email ? user.email : '---' }}</td>
+                                        <td>{{ user.phone_number ? user.phone_number : '---' }}</td>
+                                        <td class="item-status">
+                                            {{ user.address ? user.address : '---' }}
+                                        </td>
+                                        <td>
+                                            <span>
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </span>
+                                            <span>
+                                                <i class="fa-solid fa-trash"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </v-table>
+                            <div class="text-center">
+                                <v-pagination v-model="page" :length="totalPageUsers" rounded="circle"
+                                    @update:modelValue="updatePage(page, size)"></v-pagination>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="user-boder">
-                    <div class="table-content">
-                        <p class="content-p"><i class="fa-solid fa-user"></i> duy dũng</p>
-                        <p>duydungkoll@gmail.com</p>
-                        <p>09999999999</p>
-                        <p>Ngày sinh</p>
-                        <v-row justify="center">
-                            <v-dialog v-model="dialog" persistent width="1024">
-                                <template v-slot:activator="{ props }">
-                                    <span v-bind="props"><i class="fa-solid fa-pen-to-square"></i></span>
-                                    <span><i class="fa-solid fa-trash"></i></span>
-                                </template>
-                                <v-card>
-                                    <v-card-title>
-                                        <span class="text-h5">User Edit</span>
-                                    </v-card-title>
-                                    <v-card-text>
-                                        <v-container>
-                                            <v-row>
-                                                <v-col cols="12">
-                                                    <v-text-field label="Author*" required></v-text-field>
-                                                </v-col>
-                                                <v-col cols="12">
-                                                    <v-text-field label="Email*" type="text" required></v-text-field>
-                                                </v-col>
-                                                <div class="modal-col">
-                                                    <v-col cols="12" sm="6">
-                                                        <v-text-field label="Số điện thoại*" type="text"
-                                                            required></v-text-field>
-                                                    </v-col>
-                                                    <v-col cols="12" sm="6">
-                                                        <v-text-field label="Ngày sinh*" type="date"
-                                                            required></v-text-field>
-                                                    </v-col>
-                                                </div>
-                                            </v-row>
-                                        </v-container>
+            </div>
+            <div class="customer_orders" v-if="showUser">
+                <div class="customer-table-wrap">
+                    <div class="customer-table">
+                        <h4>Chi tiết đơn hàng </h4>
+                        <div class="table-margin">
+                            <v-table>
+                                <thead>
+                                    <tr>
+                                        <th class="text-left items-img">
+                                            Sản phẩm
+                                        </th>
+                                        <th class="text-left">
+                                            Mã sản phẩm
+                                        </th>
+                                        <th class="text-left">
+                                            Đơn giá
+                                        </th>
+                                        <th class="text-left">
+                                            Số lượng
+                                        </th>
+                                        <th class="text-left">
+                                            Thành tiền
+                                        </th>
 
-                                        <small>*indicates required field</small>
-                                    </v-card-text>
-                                    <v-card-actions>
-                                        <v-spacer></v-spacer>
-                                        <v-btn color="blue-darken-1" variant="text" @click="dialog = false">
-                                            Close
-                                        </v-btn>
-                                        <v-btn color="blue-darken-1" variant="text" @click="dialog = false">
-                                            Save
-                                        </v-btn>
-                                    </v-card-actions>
-                                </v-card>
-                            </v-dialog>
-                        </v-row>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="items-td">
+                                        <td class="bl-flex">
+
+                                            <span class="bl-name"></span>
+                                        </td>
+                                        <td><span>---</span></td>
+                                        <td><span></span></td>
+                                        <td><span></span></td>
+                                        <td>
+                                            <span>
+
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </v-table>
+                        </div>
                     </div>
                 </div>
-                <div class="title">
-                    <h3>Table UserManagement</h3>
-                </div>
-                <!-- <ValidationProvider v-slot="v">
-                    <input v-model="value" type="text">
-                </ValidationProvider> -->
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import { mapActions, mapState } from 'pinia'
+import { useUsersStore } from '@/stores/users'
 export default {
     components: {
     },
     data() {
         return {
             dialog: false,
+            page: 1,
+            size: 10,
+            showUser: false,
         }
     },
+    methods: {
+        ...mapActions(useUsersStore, [
+            'getUsers',
+            'getUser',
+        ]),
+        async handledetailUser(id) {
+            try {
+                await this.getUser({ id })
+                console.log('detailUser', this.detailUser);
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        async updatePage(page, size) {
+            try {
+                let limit = this.size
+                let skip = this.page
+                await this.getUsers({ skip }, { limit })
+            } catch (error) {
+                console.log(error);
+            }
+        },
+    },
+    computed: {
+        ...mapState(useUsersStore, [
+            'allUsers',
+            'detailUser',
+            'totalUsers',
+        ]),
+        totalPageUsers() {
+            return Math.ceil(this.totalUsers / this.size)
+        }
+    },
+    async created() {
+        try {
+            let limit = this.size
+            let skip = this.page
+            await this.getUsers({ skip }, { limit })
+            console.log('allUsers', this.allUsers);
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
 }
 </script>
 
 <style scoped>
-.table-user {
-    background-color: white;
-    color: #2c3e50;
-    padding-bottom: 18px;
-    margin-top: 28px;
-    border-radius: 12px;
+.ustomer-table {
     position: relative;
-    height: auto;
 }
 
-.user-boder {
-    border-top: 1px solid #bdc3c7;
-    padding: 0 24px;
+.customer-table-wrap {
+    background-color: #d9edf7;
+    padding: 8px 10px;
+    margin: 30px 0;
 }
 
-.user-title {
-    padding: 0 24px;
-
+.customer-table-wrap {
+    background-color: #d9edf7;
+    padding: 8px 10px;
+    margin: 30px 0;
 }
 
-.table-title {
-    display: flex;
-
+.customer-table-wrap {
+    background-color: #d9edf7;
+    padding: 8px 10px;
+    margin: 30px 0;
 }
 
-.table-title p {
-    width: 22.5%;
-    margin-top: 64px;
-    padding: 0 8px;
-
+.customer-table-wrap {
+    background-color: #d9edf7;
+    padding: 8px 10px;
+    margin: 30px 0;
 }
 
-.table-title span {
-    width: 10%;
+.customer-table {
+    background-color: white;
 }
 
-.table-content {
-    display: flex;
-    font-size: 0.9rem;
+.customer-table h4 {
+    padding: 4px 12px;
+    border-bottom: 1px solid #d9edf7;
+    color: black;
 }
 
-.table-content p {
-    width: 22.5%;
-    padding: 8px 0;
-    padding-left: 8px;
+.text-left {
+    width: 22%;
+    text-align: center !important;
 }
 
-.table-content span {
-    width: 10%;
-    padding: 8px 0;
-
+.items-img {
+    width: 45%;
+    text-align: left !important;
 }
 
-.title {
-    background-color: #0c2461;
-    color: white;
-    padding: 16px;
-    position: absolute;
-    width: 94%;
-    top: -10%;
-    left: 3%;
-    border-radius: 10px;
+.items-td td {
+    border-bottom: none !important;
+    font-size: 0.82rem;
+    margin-bottom: 12px;
+    margin-top: 6px;
+    text-align: center;
 }
 
-.modal-col {
+.bl-flex {
     display: flex;
 }
 
-.content-p i {
-    margin-right: 4px;
+.bl-img {
+    width: 12%;
 }
 
-.fa-solid {
-    margin-left: 12px;
+.bl-img img {
+    width: 100%;
 }
 
-::v-deep .v-row {
-    display: inline;
-    margin: 0;
-    padding: 8px 0;
+.bl-name {
+    padding: 6px 12px;
+}
+
+.bl-name {
+    padding: 6px 12px;
+}
+
+.table-margin {
+    margin: 0 !important;
+}
+
+.item-code {
     cursor: pointer;
 }
 
-::v-deep .v-row span {
+.item-code:hover {
+    color: #3498db;
+}
+
+:deep(.v-table__wrapper) {
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 30px;
+}
+
+:deep(.v-table) {
+    border-radius: 12px;
+}
+
+:deep(.v-table>.v-table__wrapper>table) {
+    margin-top: 26px;
+}
+
+.table-margin :deep(.v-table>.v-table__wrapper>table) {
+    margin-top: 0;
+}
+
+.item-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.oder-h2 {
+    color: black;
+    font-weight: 600 !important;
+}
+
+:deep(.v-input__details) {
+    display: none !important;
+}
+
+:deep(.v-input--density-default) {
+    margin-left: 30px;
+}
+
+:deep(.v-switch .v-selection-control) {
+    min-height: unset;
+    display: unset;
+}
+
+:deep(.v-input) {
+    flex: unset;
+}
+
+:deep(.v-switch .v-selection-control__wrapper) {
     margin-right: 12px;
 }
 
-::v-deep .v-card-text {
-    padding: 0 !important;
+.fa-trash {
+    margin-left: 18px;
 }
 
-::v-deep .v-container {
-    padding: 0;
+.text-center {
+    color: black;
 }
 </style>

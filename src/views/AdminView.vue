@@ -21,18 +21,18 @@
                         <span>Oder Management</span>
                     </li>
                 </ul>
-                <router-link to="/LoginAdmin"><button class="btn">Đăng Xuất</button></router-link>
             </div>
             <div class="admin-right">
                 <div class="setting-adm">
                     <div>
-                        <input type="text" placeholder="Search...">
+                        <input type="text" placeholder="Tìm kiếm..." v-model="searchProduct" @keyup.enter="onSearch()"
+                            @input="searchText($event)">
                         <i class="fa-solid fa-circle-user"></i>
                         <i class="fa-solid fa-gear"></i>
                         <i class="fa-solid fa-bell"></i>
                     </div>
                 </div>
-                <component :is="selected"></component>
+                <component :is="selected" :allProducts="allProducts"></component>
             </div>
         </div>
     </div>
@@ -42,6 +42,9 @@
 import UserManagement from '../views/admin/UserManagementView.vue';
 import ProductManagement from '../views/admin/ProductManagementView.vue';
 import OderManagement from '../views/admin/OderManagementView.vue';
+import { mapActions, mapState } from 'pinia'
+import { useProductsStore } from '@/stores/products'
+import { useUsersStore } from '@/stores/users'
 
 export default {
     components: {
@@ -52,13 +55,73 @@ export default {
     data() {
         return {
             selected: 'UserManagement',
+            page: 1,
+            size: 10,
         }
     },
     methods: {
+        ...mapActions(useProductsStore, [
+            'getCategorys',
+            'getProducts',
+        ]),
+
+        ...mapActions(useUsersStore, [
+            'checkLoggedIn'
+        ]),
+
         UserManagement() {
             this.selected = 'UserManagement'
+        },
+        async onSearch() {
+            // console.log('search', this.params)
+            this.params.keyword = this.searchProduct
+            await this.getProducts(this.params)
+        },
+
+        async searchText(event) {
+            let value = event.target.value
+            if (value === '') {
+                this.onSearch()
+            } else if (value != '') {
+                this.onSearch()
+            }
+            console.log('event: ', event.target.value);
+        },
+    },
+    computed: {
+        ...mapState(useProductsStore, [
+            'allCategory',
+            'allProducts',
+            'params'
+        ]),
+        ...mapState(useUsersStore, [
+            'auth',
+        ]),
+    },
+    async created() {
+        try {
+            console.log('auth', this.auth.user);
+            const isLoggedIn = localStorage.getItem('isLoggedIn')
+            const userData = localStorage.getItem('user')
+            if (!isLoggedIn && !userData) {
+                this.$router.push({ path: '/dang-nhap-admin' })
+            }
+
+            if (this.auth.user.is_admin == false) {
+                this.$router.push({ path: '/dang-nhap-admin' })
+            }
+
+            this.params.skip = this.page
+            this.params.limit = this.size
+            await this.getProducts(this.params)
+            await this.getCategorys()
+        } catch (error) {
+            console.log(error);
         }
-    }
+
+    },
+
+
 }
 </script>
 
@@ -116,9 +179,11 @@ export default {
 .admin-left {
     width: 20%;
     background-color: #2d3436;
-    border-radius: 12px;
+    border-radius: 12px 12px 0 0;
     margin-right: 24px;
-    position: relative;
+    position: sticky;
+    height: 100vh;
+    top: 0;
 }
 
 .color-grenn {
@@ -151,6 +216,9 @@ export default {
 
 .setting-adm {
     display: flex;
+    justify-content: end;
+    margin-right: 32px;
+    margin-top: 24px;
 }
 
 .setting-adm i {

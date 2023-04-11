@@ -185,6 +185,10 @@ export default {
       timesHours: null,
       minutes: null,
       seconds: null,
+      pageProduct: 1,
+      sizeProduct: 10,
+      pageCategory: 0,
+      sizeCategory: 20
     }
   },
 
@@ -243,12 +247,14 @@ export default {
 
   async created() {
     try {
-      await this.getAllProducts()
-      await this.getProducts()
-      this.params.skip = 0
-      this.params.limit = 20
+      this.params.skip = this.pageProduct
+      this.params.limit = this.sizeProduct
+      await this.getProducts(this.params)
+
+      this.params.skip = this.pageCategory
+      this.params.limit = this.sizeCategory
       await this.getCategorys(this.params)
-      console.log('category', this.allCategory)
+      // console.log('category', this.allCategory)
       const res = await this.allProducts
       this.data = res
     } catch (error) {

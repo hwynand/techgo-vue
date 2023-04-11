@@ -13,13 +13,6 @@ export const useCartStore = defineStore('cart', {
         totalPrice: 0,
 
     }),
-
-    getters: {
-        totalCart(state) {
-            return state.totalPrice
-        }
-    },
-
     actions: {
         async addCart(cartValue) {
             try {

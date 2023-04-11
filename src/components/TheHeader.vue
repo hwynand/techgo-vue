@@ -194,7 +194,6 @@ export default {
     return {
       showSearches: false,
       searchItems: ['điện thoại', 'pc-máy tính đồng bộ', 'laptop & macbook', 'đồng hồ thông minh', 'linh kiện máy tính'],
-      // numberCart: 0,
       showUser: false,
       searchProduct: '',
 
@@ -262,6 +261,7 @@ export default {
 
     handleLogOut() {
       this.logout()
+      this.reload()
     },
 
     onClickOutside() {
@@ -334,26 +334,22 @@ export default {
     ]),
     ...mapState(useCartStore, [
       'allCart',
-      'totalCart',
       'count'
     ]),
-
-    totalCart() {
-      let numberCart = this.allCart
-      return numberCart.length
-    },
 
   },
 
   async created() {
+    // console.log('auth', this.auth.user);
+    // console.log('count', this.count);
     try {
       const isLoggedIn = localStorage.getItem('isLoggedIn')
       const userData = localStorage.getItem('user')
       if (isLoggedIn && userData) {
-        this.getCarts()
+        await this.getCarts()
       }
 
-      this.getCategorys()
+      await this.getCategorys()
 
     } catch (error) {
       console.log(error);
@@ -361,12 +357,6 @@ export default {
 
     console.log('created');
   },
-
-
-
-  // mounted() {
-  //   this.reload()
-  // }
 
 }
 </script>

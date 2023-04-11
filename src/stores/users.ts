@@ -20,15 +20,11 @@ export const useUsersStore = defineStore('users', {
       isLoggedIn: false,
       user: null
     },
-    count: 0,
+    allUsers: [],
+    detailUser: {},
+    totalUsers: 0,
   }),
-  getters: {
-
-  },
   actions: {
-    setAuth() {
-
-    },
     async login({ email, password }) {
       const params = new URLSearchParams()
       params.append('username', email)
@@ -39,7 +35,6 @@ export const useUsersStore = defineStore('users', {
         localStorage.setItem('access-token', res.data.access_token)
         localStorage.setItem('isLoggedIn', 'true')
         const resProfile = await this.getProfile()
-
       }
       return res
     },
@@ -75,6 +70,27 @@ export const useUsersStore = defineStore('users', {
       this.auth.isLoggedIn = false
       localStorage.removeItem('user')
       localStorage.removeItem('isLoggedIn')
+    },
+    async getUsers({ skip }, { limit }) {
+      try {
+        const res = await authApi.get(`/users/?page=${skip}&size=${limit}`)
+        if (res.status === 200) {
+          this.allUsers = res.data.results
+          this.totalUsers = res.data.total
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getUser({ id }) {
+      try {
+        const res = await authApi.get(`/users/${id}`)
+        if (res.status === 200) {
+          this.detailUser = res.data.results
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 })

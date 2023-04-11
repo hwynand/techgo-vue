@@ -6,7 +6,7 @@
                 <div class="list-product-content-box">
                     <div class="list-product-adress">
                         <div>
-                            <p> Trang chủ / Sản phẩm khuyến mại</p>
+                            <p> Trang chủ / Danh sách sản phẩm</p>
                         </div>
                     </div>
                     <div class="list-product-content-block">
@@ -94,8 +94,8 @@
                                     <div class="list-CartProduct" v-if="allProducts.length !== 0">
                                         <ProductCard v-for="(product, i) in allProducts" :key="i" :name="product.name"
                                             :brand="product.brand.name"
-                                            :url="product.product_variants[0].images[0].image_path" :id="product.id"
-                                            :price="product.product_variants[0].price">
+                                            :url="product.product_variants[0]?.images[0]?.image_path" :id="product.id"
+                                            :price="product.product_variants[0]?.price">
                                         </ProductCard>
                                     </div>
 
@@ -110,7 +110,8 @@
                                 </div>
                                 <div class="text-center">
                                     <v-pagination v-model="page" :length="totalPages" rounded="circle"
-                                        @update:modelValue="updatePage(page, size)"></v-pagination>
+                                        @update:modelValue="updatePage(page, size)">
+                                    </v-pagination>
                                 </div>
                             </div>
                         </div>
@@ -185,7 +186,6 @@ export default {
             this.params.skip = page
             this.params.limit = size
             this.getProducts(this.params)
-            console.log(page, size);
         },
 
         async filterBrands() {

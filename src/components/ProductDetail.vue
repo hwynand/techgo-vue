@@ -33,9 +33,11 @@
                             <div class="product-center">
                                 <span>Tình trạng:
                                     <span
-                                        :class="[detailProduct.product_variants[currentIndex].inventory > 0 ? 'statusGold' : 'statusRed']">{{
-                                            detailProduct.product_variants[currentIndex].inventory > 0 ? 'Còn Hàng' : 'Hết Hàng'
-                                        }}</span>
+                                        :class="[detailProduct.product_variants[currentIndex]?.inventory > 0 ? 'statusGold' : 'statusRed']">
+                                        {{ detailProduct.product_variants[currentIndex]?.inventory > 0 ? 'Còn Hàng' :
+                                            'Hết Hàng'
+                                        }}
+                                    </span>
                                 </span>
                                 <span>Thương Hiệu: <span class="Trademark">{{ detailProduct.brand.name }}</span></span>
                             </div>
@@ -235,7 +237,7 @@ export default {
 
         onDiscount() {
             let index = this.currentIndex;
-            let price = this.detailProduct.product_variants[index].price;
+            let price = this.detailProduct.product_variants[index]?.price;
             if (this.number == 1) {
                 return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(price);
             } else {
@@ -301,7 +303,6 @@ export default {
                     this.cartValue.product_variant_id = val
                     this.cartValue.qty = this.number
                     const res = await this.addCart(this.cartValue)
-                    // this.reload()
                 } else {
                     Swal.fire('Sản phẩm hết hàng')
 

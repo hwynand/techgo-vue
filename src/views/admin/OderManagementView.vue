@@ -1,4 +1,5 @@
 <template>
+    <h2 class="oder-h2">Danh sách quản lí Oders <i class="fa-solid fa-cart-shopping"></i></h2>
     <div class="oder-management">
         <div class="management-box">
             <div class="customer_orders">
@@ -18,7 +19,7 @@
                                             Thành tiền
                                         </th>
                                         <th class="text-left">
-                                            Trạng thái thanh toán
+                                            Trạng thái
                                         </th>
                                         <th class="text-left">
                                             Vận chuyển
@@ -27,18 +28,21 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="items-td" v-for="(item, index) in orderList" :key="item.menu">
-                                        <td @click="handleShowListOder(index)">{{ item.menu }}</td>
-                                        <td>{{ item.date }}</td>
-                                        <td>{{ item.price }}</td>
-                                        <td>{{ item.status }}</td>
-                                        <td>{{ item.ship }}</td>
+                                    <tr class="items-td" v-for="(item, index) in admGetAllOders" :key="item.menu">
+                                        <td class="item-code" @click="handleShowListOder(item.id)">
+                                            #{{ item.code }}
+                                            <span><i class="fa-solid fa-eye"></i></span>
+                                        </td>
+                                        <td>11/4/2023</td>
+                                        <td>{{ formatPriceTotals(item.total) }}</td>
+                                        <td class="item-status">
+                                            <v-switch v-model="model" color="success" value="0"></v-switch>
+                                            {{ item.status === 0 ? 'Chờ xử lý' : 'Đang giao hàng' }}
+                                        </td>
+                                        <td>Chờ xử lý</td>
                                     </tr>
                                 </tbody>
                             </v-table>
-                        </div>
-                        <div class="title">
-                            <h3>Table ProductManagement</h3>
                         </div>
                     </div>
                 </div>
@@ -46,7 +50,7 @@
             <div class="customer_orders" v-if="showListOder">
                 <div class="customer-table-wrap">
                     <div class="customer-table">
-                        <h4>Chi tiết đơn hàng {{ orderList.menu }}</h4>
+                        <h4>Chi tiết đơn hàng {{ '#' + getOderId.code }}</h4>
                         <div class="table-margin">
                             <v-table>
                                 <thead>
@@ -70,24 +74,28 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="items-td" v-for="item in orderDetail" :key="item.name">
+                                    <tr class="items-td" v-for="item in getOderId.order_items" :key="item.name">
                                         <td class="bl-flex">
                                             <div class="bl-img">
-                                                <img :src="item.thumb" alt="">
+                                                <img :src="item.product_variant.images?.[0]?.image_path" alt="">
                                             </div>
-                                            <span class="bl-name">{{ item.name }}</span>
+                                            <span class="bl-name">{{ item.product_variant.name }}</span>
                                         </td>
-                                        <td><span>{{ item.productcode }}</span></td>
-                                        <td><span>{{ item.unitprice }}</span></td>
-                                        <td><span>{{ item.salary }}</span></td>
-                                        <td><span> 20.916.000đ</span></td>
+                                        <td><span>---</span></td>
+                                        <td><span>{{ priceProductVariant(item.product_variant?.price) }}</span></td>
+                                        <td><span>{{ item?.qty }}</span></td>
+                                        <td>
+                                            <span>
+                                                {{ totalPriceProductVariant(item.product_variant?.price, item?.qty) }}
+                                            </span>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </v-table>
                             <div class="block-body">
                                 <div class="block-p">
                                     <p>Tổng tiền :</p>
-                                    <p>20.916.000đ</p>
+                                    <p style="margin-right: 16px;">{{ totalPriceOder }}</p>
                                 </div>
                             </div>
                         </div>
@@ -99,6 +107,8 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'pinia';
+import { useOderStore } from '@/stores/oders'
 export default {
     components: {
 
@@ -106,36 +116,60 @@ export default {
     data() {
         return {
             showListOder: false,
-            orderList: [
-                { menu: '#100037', date: '08/02/2023', price: '62550000', status: 'Chờ sử lý', ship: 'Chờ sử lý' },
-                { menu: '#100037', date: '08/02/2023', price: '62550000', status: 'Chờ sử lý', ship: 'Chờ sử lý' },
-            ],
-            orderDetail: [
-                {
-                    thumb: 'https://product.hstatic.net/200000516791/product/product_28_1_5043e2df20164cd1a4dbca5bb832937f_178c708a80114db18ee385c6f26fa0eb_master.png',
-                    name: 'Smart Tivi NanoCell LG 4K 50 inch 50NANO86TPA', unitprice: '20916000', salary: '1', productcode: '',
-                },
-                {
-                    thumb: 'https://product.hstatic.net/200000516791/product/product_28_1_5043e2df20164cd1a4dbca5bb832937f_178c708a80114db18ee385c6f26fa0eb_master.png',
-                    name: 'Smart Tivi NanoCell LG 4K 50 inch 50NANO86TPA', unitprice: '20916000', salary: '1', productcode: '',
-                },
-                {
-                    thumb: 'https://product.hstatic.net/200000516791/product/product_28_1_5043e2df20164cd1a4dbca5bb832937f_178c708a80114db18ee385c6f26fa0eb_master.png',
-                    name: 'Smart Tivi NanoCell LG 4K 50 inch 50NANO86TPA', unitprice: '20916000', salary: '1', productcode: '',
-                },
-                {
-                    thumb: 'https://product.hstatic.net/200000516791/product/product_28_1_5043e2df20164cd1a4dbca5bb832937f_178c708a80114db18ee385c6f26fa0eb_master.png',
-                    name: 'Smart Tivi NanoCell LG 4K 50 inch 50NANO86TPA', unitprice: '20916000', salary: '1', productcode: '',
-                },
-            ],
+            page: 1,
+            size: 10,
+            model: [0, 1],
         }
     },
 
     methods: {
-        handleShowListOder(index) {
-            this.showListOder = true;
-            console.log(index);
+        click(e) {
+            console.log(e);
+        },
+        ...mapActions(useOderStore, [
+            'getAllOders',
+            'getOder',
+        ]),
+        async handleShowListOder(id) {
+            try {
+                await this.getOder(id)
+                this.showListOder = true;
+                console.log('getOderId1', this.getOderId);
+            } catch (error) {
+
+            }
+        },
+        formatPriceTotals(total) {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(total);
+        },
+        priceProductVariant(price) {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(price);
+        },
+        totalPriceProductVariant(price, qty) {
+            let number = price * qty;
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(number);
         }
+    },
+    computed: {
+        ...mapState(useOderStore, [
+            'admGetAllOders',
+            'getOderId',
+        ]),
+
+        totalPriceOder() {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(this.getOderId.total);
+        }
+
+
+    },
+    async created() {
+        try {
+            await this.getAllOders(this.page, this.size)
+            console.log('admGetAllOders', this.admGetAllOders);
+        } catch (error) {
+            console.log(error);
+        }
+
     }
 
 }
@@ -144,17 +178,6 @@ export default {
 <style scoped>
 .ustomer-table {
     position: relative;
-}
-
-.title {
-    background-color: #0c2461;
-    color: white;
-    padding: 16px;
-    position: absolute;
-    width: 75%;
-    border-radius: 10px;
-    top: 12%;
-    left: 23%;
 }
 
 .customer-table-wrap {
@@ -250,21 +273,61 @@ export default {
     font-size: 0.9rem;
 }
 
-::v-deep .v-table__wrapper {
+.item-code {
+    cursor: pointer;
+}
+
+.item-code:hover {
+    color: #3498db;
+}
+
+:deep(.v-table__wrapper) {
     border-radius: 12px;
     overflow: hidden;
     margin-top: 30px;
 }
 
-::v-deep .v-table {
+:deep(.v-table) {
     border-radius: 12px;
 }
 
-::v-deep .v-table>.v-table__wrapper>table {
+:deep(.v-table>.v-table__wrapper>table) {
     margin-top: 26px;
 }
 
-.table-margin ::v-deep .v-table>.v-table__wrapper>table {
+.table-margin :deep(.v-table>.v-table__wrapper>table) {
     margin-top: 0;
+}
+
+.item-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.oder-h2 {
+    color: black;
+    font-weight: 600 !important;
+}
+
+:deep(.v-input__details) {
+    display: none !important;
+}
+
+:deep(.v-input--density-default) {
+    margin-left: 30px;
+}
+
+:deep(.v-switch .v-selection-control) {
+    min-height: unset;
+    display: unset;
+}
+
+:deep(.v-input) {
+    flex: unset;
+}
+
+:deep(.v-switch .v-selection-control__wrapper) {
+    margin-right: 12px;
 }
 </style>
