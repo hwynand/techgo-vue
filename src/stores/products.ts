@@ -43,6 +43,8 @@ interface ParamsGetProduct {
   brand_id?: number[],
   skip?: number,
   limit?: number,
+  min_price?: number,
+  max_price?: number,
 }
 
 enum ProductTypes {
@@ -123,7 +125,7 @@ export const useProductsStore = defineStore('products', {
             type: ProductTypes.PROMOTION,
           }
         })
-        this.promotionProducts = res.data
+        this.promotionProducts = res.data.results
       } catch (e) {
         console.error(e)
       }
@@ -136,7 +138,7 @@ export const useProductsStore = defineStore('products', {
             type: ProductTypes.TOP_SELLER,
           }
         })
-        this.topSellerProducts = res.data
+        this.topSellerProducts = res.data.results
       } catch (e) {
         console.error(e)
       }
@@ -149,7 +151,7 @@ export const useProductsStore = defineStore('products', {
             type: ProductTypes.NEW_COLLECTION,
           }
         })
-        this.newCollectionProducts = res.data
+        this.newCollectionProducts = res.data.results
       } catch (e) {
         console.error(e)
       }
@@ -162,7 +164,7 @@ export const useProductsStore = defineStore('products', {
             type: ProductTypes.HIGH_END,
           }
         })
-        this.highEndProducts = res.data
+        this.highEndProducts = res.data.results
       } catch (e) {
         console.error(e)
       }
@@ -175,6 +177,14 @@ export const useProductsStore = defineStore('products', {
         console.log(error);
       }
     },
+    async updateProduct(id: Number, { data }) {
+      try {
+        const res = await authApi.put(`/products/${id}`, data)
+        console.log('add products', res);
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async deleteProduct(id: Number) {
       try {
         await authApi.delete(`/products/${id}`)
@@ -182,17 +192,23 @@ export const useProductsStore = defineStore('products', {
         console.log(error);
       }
     },
-    async uploadImage(image: Image) {
+    async uploadImage(image: any, data: any, cb: any) {
+      console.log('upload image', image)
+      var form = new FormData();
+      form.append('file', image[0]);
       try {
-        const res = await authApi.post('/product-variants/uploadfile/', image)
+        const res = await authApi.post('/product-variants/uploadfile/', form)
         if (res.status === 200) {
           this.image_path = res.data
+          cb(data, res.data)
+
         }
       } catch (error) {
         console.log(error);
       }
     },
     async addProductVariant(id: Number, variant: ProductVariant) {
+      console.log('variant_', variant)
       try {
         await authApi.post(`/product-variants/products/${id}/variants`, variant)
       } catch (error) {

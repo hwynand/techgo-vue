@@ -8,7 +8,7 @@
                             <h4>Quản Lý Sản Phẩm <i class="fa-solid fa-folder-open"></i></h4>
                             <div class="select-category">
                                 <v-select label="Loại sản phẩm" :items="allCategory" item-title="name" item-value="id"
-                                    variant="solo" @update:modelValue="filterCategorys">
+                                    variant="solo" :item-props="true" @update:modelValue="filterCategorys">
                                 </v-select>
                             </div>
                             <div class="select-category">
@@ -17,7 +17,8 @@
                                 </v-select>
                             </div>
                             <div class="add-product">
-                                <AddProductView :allCategory="allCategory" :allBrand="allBrand" :dialog="dialog">
+                                <AddProductView :allCategory="allCategory" :allBrand="allBrand" :dialog="dialog"
+                                    :page="page" :size="size">
                                 </AddProductView>
                             </div>
                         </div>
@@ -68,8 +69,8 @@
                                             <span>{{ formatPrice(item.product_variants[0]?.price) }}</span>
                                         </td>
                                         <td class="item-delete">
-                                            <span @click="editProduct(item)"><i
-                                                    class="fa-solid fa-pen-to-square"></i></span>
+                                            <span @click="editProduct(item)">
+                                                <i class="fa-solid fa-pen-to-square"></i></span>
                                             <span @click="handleDeleteProduct(item.id)"><i
                                                     class="fa-solid fa-trash"></i></span>
                                         </td>
@@ -165,12 +166,53 @@
                 </div>
                 <div v-else>
                     <ProductVariantsView :id="idProduct" :showCreateProductVariants="showCreateProductVariants"
-                        :valProductVariant="valProductVariant" @handaleClose="close()">
+                        :valProductVariant="valProductVariant" :isShowEditVariant="isShowEditVariant"
+                        @handaleClose="close()">
                     </ProductVariantsView>
                 </div>
             </div>
         </div>
 
+        <!-- ---------------------------edit product------------------------------------- -->
+        <div class="management-box" v-if="showEditProduct">
+            <div class="customer_orders">
+                <div class="customer-table-wrap">
+                    <div class="customer-table">
+                        <h3>Chỉnh sửa sản phẩm <i class="fa-solid fa-feather"></i></h3>
+                        <div class="edit-product">
+                            <v-row>
+                                <v-col cols="12" sm="6" md="4">
+                                    <v-text-field label="Name" variant="solo"
+                                        v-model="valUpdateProduct.name"></v-text-field>
+                                </v-col>
+                                <v-col cols="12" sm="6" md="4">
+                                    <v-select label="Categorys" :items="allCategory" item-title="name" item-value="id"
+                                        required variant="solo" v-model="valUpdateProduct.category_id"></v-select>
+                                </v-col>
+                                <v-col cols="12" sm="6" md="4">
+                                    <v-select label="Brands" :items="allBrand" item-title="name" item-value="id" required
+                                        variant="solo" v-model="valUpdateProduct.brand_id"></v-select>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-textarea label="Description..." variant="solo"
+                                        v-model="valUpdateProduct.description"></v-textarea>
+                                </v-col>
+                            </v-row>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn color="blue-darken-1" variant="text"
+                                    @click="dialog = false, showEditProduct = false">
+                                    Close
+                                </v-btn>
+                                <v-btn color="blue-darken-1" variant="text" @click="handaleUpdateProduct()">
+                                    Save
+                                </v-btn>
+                            </v-card-actions>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -200,6 +242,15 @@ export default {
             dialog: false,
             valueEditProductVariants: {},
             valProductVariant: {},
+            isShowEditVariant: false,
+            showEditProduct: false,
+            valUpdateProduct: {
+                name: '',
+                category_id: '',
+                brand_id: '',
+                description: '',
+            },
+            idProduct: 0,
         }
     },
 
@@ -210,13 +261,20 @@ export default {
             'deleteProduct',
             'deleteProductVariants',
             'getProductVariant',
+            'getBrand',
+            'getCategorys',
+            'updateProduct',
         ]),
         filterBrands(id) {
             this.params.brand_id = id
+            this.params.skip = this.page
+            this.params.limit = this.size
             this.getProducts(this.params)
         },
         filterCategorys(id) {
             this.params.category_id = id
+            this.params.skip = this.page
+            this.params.limit = this.size
             this.getProducts(this.params)
         },
         formatPrice(price) {
@@ -233,9 +291,14 @@ export default {
             this.idProduct = id
             this.getProductVariants(id)
             this.showDetail = true
+            this.showEditProduct = false
         },
-        handaleComebackProduct() {
+        async handaleComebackProduct() {
+            this.params.skip = this.page
+            this.params.limit = this.size
+            await this.getProducts(this.params)
             this.showDetail = false
+            this.valProductVariant = ''
         },
         addProductVariants() {
             this.showCreateProductVariants = true
@@ -275,17 +338,48 @@ export default {
             }
         },
         editProduct(item) {
+            // this.showDetail = false
+            this.valUpdateProduct = {
+                name: item.name,
+                category_id: item.category,
+                brand_id: item.brand,
+                description: item.description,
+            }
+            this.idProduct = item.id
+            this.showEditProduct = true
             console.log(item, 'item');
         },
         async handleEditProductVariant(idVariant) {
             try {
                 let idProduct = this.idProduct
                 await this.getProductVariant(idProduct, idVariant)
+                this.isShowEditVariant = true
                 this.valProductVariant = this.detailVariant
             } catch (error) {
                 console.log(error);
             }
             this.showCreateProductVariants = true
+        },
+        async handaleUpdateProduct() {
+            try {
+                const id = this.idProduct
+                let data = {
+                    name: this.valUpdateProduct.name,
+                    category_id: this.valUpdateProduct.category_id.id,
+                    brand_id: this.valUpdateProduct.brand_id.id,
+                    description: this.valUpdateProduct.description,
+                }
+                await this.updateProduct(id, { data })
+                this.params.skip = this.page
+                this.params.limit = this.size
+                await this.getProducts(this.params)
+                this.showEditProduct = false
+                this.valUpdateProduct = ''
+                console.log('valUpdateProduct', id);
+            } catch (error) {
+                console.log(error);
+            }
+
         }
     },
 
@@ -322,7 +416,8 @@ export default {
 
     async created() {
         console.log('createdaa', this.valProductVariant);
-    }
+    },
+
 
 }
 </script>
@@ -352,24 +447,7 @@ export default {
     background-color: #d9edf7;
     padding: 8px 10px;
     margin: 30px 0;
-}
-
-.customer-table-wrap {
-    background-color: #d9edf7;
-    padding: 8px 10px;
-    margin: 30px 0;
-}
-
-.customer-table-wrap {
-    background-color: #d9edf7;
-    padding: 8px 10px;
-    margin: 30px 0;
-}
-
-.customer-table-wrap {
-    background-color: #d9edf7;
-    padding: 8px 10px;
-    margin: 30px 0;
+    color: black;
 }
 
 .customer-table {
@@ -511,6 +589,15 @@ export default {
     margin-left: 6px;
     font-weight: bold;
     color: #2980b9;
+}
+
+.customer-table h3 {
+    padding: 8px;
+    font-size: 1rem;
+}
+
+.edit-product {
+    padding: 0 32px;
 }
 
 :deep(.v-table__wrapper) {

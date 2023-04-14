@@ -61,7 +61,6 @@ export default {
     },
     methods: {
         ...mapActions(useProductsStore, [
-            'getCategorys',
             'getProducts',
         ]),
 
@@ -90,7 +89,6 @@ export default {
     },
     computed: {
         ...mapState(useProductsStore, [
-            'allCategory',
             'allProducts',
             'params'
         ]),
@@ -114,7 +112,6 @@ export default {
             this.params.skip = this.page
             this.params.limit = this.size
             await this.getProducts(this.params)
-            await this.getCategorys()
         } catch (error) {
             console.log(error);
         }

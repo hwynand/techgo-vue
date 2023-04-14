@@ -25,9 +25,9 @@
                                     <p>
                                         <span class="items-span">{{ formatPrice(cart.product_variant.price, cart.qty)
                                         }}</span>
-                                        <span class="items-span" :class="[cart.qty > 0 ? 'items-underlined' : '']">{{
+                                        <!-- <span class="items-span" :class="[cart.qty > 0 ? 'items-underlined' : '']">{{
                                             cart.product_variant.price
-                                        }}</span>
+                                        }}</span> -->
                                     </p>
                                 </div>
                                 <div class="media-items-price-pay">
@@ -170,6 +170,84 @@ export default {
             newPrice: 0,
             priceOneProduct: 0,
             qtyCart: 0,
+            // variants: [
+            //     {
+            //         id: 68,
+            //         product_variant: {
+            //             id: 18,
+            //             product_id: 8,
+            //             name: 'iphone14-promax-vàng',
+            //             color: '#fff200',
+            //             sku: 'ip1T',
+            //             price: 49990000,
+            //             inventory: 15,
+            //             images: [
+            //                 {
+            //                     id: 75,
+            //                     image_path: 'https://pxh09.cloud/files/cc37639890af62ce.png'
+            //                 }
+            //             ]
+            //         },
+            //         qty: 1
+            //     },
+            //     {
+            //         id: 69,
+            //         product_variant: {
+            //             id: 18,
+            //             product_id: 8,
+            //             name: 'iphone14-promax-vàng',
+            //             color: '#fff200',
+            //             sku: 'ip1T',
+            //             price: 49990000,
+            //             inventory: 15,
+            //             images: [
+            //                 {
+            //                     id: 75,
+            //                     image_path: 'https://pxh09.cloud/files/cc37639890af62ce.png'
+            //                 }
+            //             ]
+            //         },
+            //         qty: 1
+            //     },
+            //     {
+            //         id: 70,
+            //         product_variant: {
+            //             id: 18,
+            //             product_id: 8,
+            //             name: 'iphone14-promax-vàng',
+            //             color: '#fff200',
+            //             sku: 'ip1T',
+            //             price: 49990000,
+            //             inventory: 15,
+            //             images: [
+            //                 {
+            //                     id: 75,
+            //                     image_path: 'https://pxh09.cloud/files/cc37639890af62ce.png'
+            //                 }
+            //             ]
+            //         },
+            //         qty: 1
+            //     },
+            //     {
+            //         id: 71,
+            //         product_variant: {
+            //             id: 19,
+            //             product_id: 8,
+            //             name: 'iphone14-promax-tím',
+            //             color: '#be2edd',
+            //             sku: 'ip1T',
+            //             price: 49990000,
+            //             inventory: 15,
+            //             images: [
+            //                 {
+            //                     id: 76,
+            //                     image_path: 'https://pxh09.cloud/files/cc3f67ed16d13a63.jpg'
+            //                 }
+            //             ]
+            //         },
+            //         qty: 1
+            //     }
+            // ]
 
         }
     },
@@ -185,32 +263,35 @@ export default {
                     qty: cart.qty += 1
                 }
                 console.log('update', id, cartValue);
-                const res = await this.updateCart(id, cartValue)
-                if (res.status === 200) {
-                    this.getCarts()
-                }
+                await this.updateCart(id, cartValue)
+                await this.getCarts()
             } catch (error) {
                 console.log(error);
             }
         },
 
         async onClickMinus(cart) {
+
             try {
                 const id = cart.id
                 const cartValue = {
                     product_variant_id: cart.product_variant.id,
                     qty: cart.qty -= 1
                 }
-                if (cartValue.qty > 0) {
-                    const res = await this.updateCart(id, cartValue)
-                    if (res.status === 200) {
-                        this.getCarts()
-                    }
-                } else {
-                    this.handaleDeleteCart(id)
+                if (cartValue.qty === 0) {
+                    this.deleteCart(id)
+                    this.getCarts()
                 }
+                // console.log('cartValue', cartValue.qty);
 
-
+                // if (cart.qty > 0) {
+                //     this.cartValue.product_variant_id = cart.product_variant.id
+                //     this.cartValue.qty = cart.qty -= 1
+                //     await this.updateCart(id, this.cartValue)
+                //     await this.getCarts()
+                // } else {
+                //     this.handaleDeleteCart(id)
+                // }
             } catch (error) {
                 console.log(error);
             }
@@ -238,6 +319,8 @@ export default {
                         'success'
                     )
                     this.deleteCart(id)
+                    this.getCarts()
+                } else {
                     this.getCarts()
                 }
             })
@@ -276,14 +359,46 @@ export default {
         priceOder() {
             const number = this.priceOneProduct * this.qtyCart
             return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(number);
-        }
+        },
+
+        // filteredProducts() {
+        //     // Lọc ra các phần tử có product_variant giống nhau
+        //     const filtered = this.products.filter((product, index, self) =>
+        //         index ===
+        //         self.findIndex((t) => (
+        //             t.product_variant.id === product.product_variant.id
+        //         ))
+        //     );
+
+        //     // Cộng qty của các phần tử có product_variant giống nhau lại
+        //     const reduced = filtered.reduce((acc, product) => {
+        //         const existingProduct = acc.find(
+        //             (p) => p.product)
+        //     }),
+        // groupedVariants() {
+        //     const grouped = {};
+        //     this.variants.forEach(variant => {
+        //         const key = variant.product_variant.id;
+        //         if (!grouped[key]) {
+        //             grouped[key] = { ...variant };
+        //         } else {
+        //             grouped[key].qty += variant.qty;
+        //         }
+        //     });
+        //     return Object.values(grouped);
+        // }
 
     },
 
     async created() {
         try {
-            await this.getCarts()
-            console.log('cartall', this.allCart);
+            const isLoggedIn = localStorage.getItem('isLoggedIn')
+            const userData = localStorage.getItem('user')
+            if (isLoggedIn && userData) {
+                await this.getCarts()
+                console.log('cartall', this.allCart);
+            }
+
         } catch (error) {
             console.log(error);
         }

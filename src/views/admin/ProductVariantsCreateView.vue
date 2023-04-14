@@ -9,8 +9,12 @@
                         <img :src="image" />
                         <button class="img-btn" @click="removeImage(index)"><i class="fa-solid fa-xmark"></i></button>
                     </div>
+                    <!-- <div class="img-product" v-else>
+                        <img :src="productVariant.images?.[0].image_path" />
+                        <button class="img-btn" @click="removeImage(index)"><i class="fa-solid fa-xmark"></i></button>
+                    </div> -->
                     <v-file-input :rules="rules" accept="image/png, image/jpeg, image/bmp" placeholder="Pick an avatar"
-                        prepend-icon="mdi-camera" label="Avatar" multiple @change="onFileChange"></v-file-input>
+                        prepend-icon="mdi-camera" label="Avatar" @change="onFileChange"></v-file-input>
                 </div>
                 <div class="box-input box-margin">
                     <p>Mã SKU (*) :</p>
@@ -33,15 +37,16 @@
                     <input type="number" v-model="productVariant.inventory">
                 </div>
                 <div class="flex-btn">
-                    <button class="box-btn" @click="createProductVanriants()" v-if="!valProductVariant">
-                        Thêm sản phẩm
-                    </button>
-                    <button class="box-btn" @click="updateProductVanriants()" v-else>
+                    <button v-if="isShowEditVariant && valProductVariant" class="box-btn" @click="updateProductVanriants()">
                         Update
+                    </button>
+                    <button v-else class="box-btn" @click="createProductVanriants()">
+                        Thêm sản phẩm
                     </button>
                     <button class="box-btn" @click="$emit('handaleClose')">Huỷ</button>
                 </div>
             </div>
+
         </div>
 
     </div>
@@ -75,6 +80,10 @@ export default {
         valProductVariant: {
             type: Object,
             required: true,
+        },
+        isShowEditVariant: {
+            type: Boolean,
+            required: true,
         }
     },
     methods: {
@@ -91,7 +100,6 @@ export default {
             if (!files.length) return;
             this.createImage(files);
             this.uploadImg = files
-            // console.log(files.length, 'files');
         },
         createImage(files) {
             var vm = this;
@@ -109,36 +117,31 @@ export default {
         },
         async createProductVanriants() {
             try {
-                var form = new FormData();
-                const image = this.uploadImg
-                form.append('file', image[0]);
-                await this.uploadImage(form)
-
-                const id = this.id
-                const data = this.productVariant
-                data.images.push({ image_path: this.image_path })
-                await this.addProductVariant(id, data)
-                await this.getProductVariants(id)
+                let images
+                const cb = (data, image_path) => {
+                    images = { ...data, images: [{ image_path }] }
+                    return
+                }
+                await this.uploadImage(this.uploadImg, { ...this.productVariant }, cb)
+                await this.addProductVariant(this.id, images)
+                await this.getProductVariants(this.id)
                 this.$emit('handaleClose')
+                console.log(1);
             } catch (error) {
                 console.log(error);
             }
         },
         async updateProductVanriants() {
             try {
-                var form = new FormData();
-                const image = this.uploadImg
-                form.append('file', image[0]);
-                await this.uploadImage(form)
-
-
-                let product_id = this.id
-                let variant_id = this.productVariant.id
-                let variant = this.productVariant
-                variant.images.splice(0, 1, { image_path: this.image_path })
-                console.log(product_id, variant_id, variant);
-                await this.updateProductVariant(product_id, variant_id, variant)
-                await this.getProductVariants(product_id)
+                let images
+                const cb = (data, image_path) => {
+                    images = { ...data, images: [{ image_path }] }
+                    return
+                }
+                await this.uploadImage(this.uploadImg, { ...this.productVariant }, cb)
+                this.productVariant.images.splice(0, 1, { image_path: this.image_path })
+                await this.updateProductVariant(this.id, this.productVariant.id, this.productVariant)
+                await this.getProductVariants(this.id)
                 this.$emit('handaleClose')
             } catch (error) {
                 console.log(error);
@@ -158,9 +161,7 @@ export default {
     created() {
         if (this.valProductVariant) {
             this.productVariant = this.valProductVariant
-            console.log('createdId', this.valProductVariant);
         }
-
 
     }
 }

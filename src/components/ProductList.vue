@@ -21,7 +21,7 @@
                                             <ul>
                                                 <li><a href="">Sản phẩm khuyến mại</a></li>
                                                 <li><a href="">Sản phẩm nổi bật</a></li>
-                                                <li><a href="">Tất cả sản phẩm</a></li>
+                                                <li @click="handaleAllProducts"><a href="">Tất cả sản phẩm</a></li>
                                             </ul>
                                         </div>
 
@@ -50,13 +50,23 @@
                                             <div class="product-h4">
                                                 <h4>Lọc giá</h4>
                                             </div>
-                                            <ul v-for="(price, i) in price" :key="i">
-                                                <li>
-                                                    <input type="checkbox" :value="price">
-                                                    <span>{{ price }}</span>
-                                                </li>
-
-                                            </ul>
+                                            <v-range-slider v-model="range" :max="50000000" :min="0" :step="100000"
+                                                hide-details class="align-center" @update:modelValue="filterPrice($event)">
+                                                <template v-slot:prepend>
+                                                    <v-text-field :model-value="range[0]" hide-details single-line
+                                                        type="number" variant="outlined" density="compact"
+                                                        style="width: 70px" @change="$set(range, 0, $event)"></v-text-field>
+                                                </template>
+                                                <template v-slot:append>
+                                                    <v-text-field :model-value="range[1]" hide-details single-line
+                                                        type="number" variant="outlined" style="width: 70px"
+                                                        density="compact" @change="$set(range, 1, $event)"></v-text-field>
+                                                </template>
+                                            </v-range-slider>
+                                            <div class="range-input">
+                                                <input type="text" v-model="range[0]">
+                                                <input type="text" v-model="range[1]">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -137,14 +147,12 @@ export default {
 
     data() {
         return {
+            searchTimeout: null,
             searchText: '',
             page: 1,
             size: 10,
-            readonly: false,
-            brands: ['Apple', 'Sam sung', 'Sony', 'LG', 'Oppo', 'Lenovo', 'Nokia', 'Xiaomi'],
             menuBrand: '',
-            price: ['Dưới 2.000.000đ', '2.000.000đ - 5.000.000đ', '5.000.000đ - 15.000.000đ', '15.000.000đ - 30.000.000đ', 'Trên 30.000.000đ'],
-            ex4: ['orange'],
+            range: [0, 50000000],
             items: [
                 { title: 'Sản phẩm nổi bật' },
                 { title: 'Giá Tăng Dần' },
@@ -153,8 +161,6 @@ export default {
                 { title: 'Tên Z - A' },
             ],
             selectedBrand: [],
-            selectedPrice: [],
-            isShowProducts: false,
         }
     },
     methods: {
@@ -197,6 +203,21 @@ export default {
             }
         },
 
+        async filterPrice(rangePrice) {
+            const cb = () => {
+                this.params.min_price = rangePrice[0]
+                this.params.max_price = rangePrice[1]
+                this.getProducts(this.params)
+            }
+
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(function () {
+                console.log('seaching')
+                cb()
+
+            }, 500);
+        },
+
         // formatPrice(price) {
         //     console.log(price);
         //     return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(price);
@@ -207,6 +228,12 @@ export default {
                 return this.allProducts.sort((a, b) => a.product_variants[0].price - b.product_variants[0].price);
             }
         },
+
+        async handaleAllProducts() {
+            this.params.skip = this.page
+            this.params.limit = this.size
+            await this.getProducts(this.params)
+        }
     },
 
     computed: {
@@ -458,6 +485,28 @@ export default {
     margin-right: 12px;
 }
 
+.range-input {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.range-input input {
+    width: 30%;
+    border: 1px solid gray;
+    padding: 6px;
+    margin: 6px;
+}
+
+:deep(.v-input__prepend) {
+    display: none !important;
+}
+
+:deep(.v-input__append) {
+    display: none !important;
+    ;
+}
+
 /* ::v-deep .v-pagination__list {
     justify-content: right;
   } */
@@ -484,5 +533,13 @@ export default {
 
 :deep(.btn_add-cart) {
     width: 100%;
+}
+
+:deep(.v-slider.v-input--horizontal .v-slider-thumb) {
+    display: none;
+}
+
+:deep(.v-field__input) {
+    padding-inline-start: unset;
 }
 </style>

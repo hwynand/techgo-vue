@@ -50,9 +50,9 @@
             <div class="slide-group ">
               <v-sheet class="mx-auto" elevation="8" max-width="100%">
                 <v-slide-group v-model="model" class="pa-4" center-active show-arrows>
-                  <v-slide-group-item v-for="(products, i) in data" :key="i" v-slot="{ isSelected, toggle }">
-                    <v-card class="ma-4" width="228">
-                      <ProductCardVue :url="products.product_variants[0].images[0].image_path" :name="products.name"
+                  <v-slide-group-item v-for="(products, i) in topSellerProducts" :key="i" v-slot="{ isSelected, toggle }">
+                    <v-card class="ma-4" width="218">
+                      <ProductCardVue :url="products.product_variants[0]?.images[0].image_path" :name="products.name"
                         :brand="products.brand.name" :price="products.product_variants[0]?.price" :id="products.id">
                       </ProductCardVue>
                     </v-card>
@@ -99,9 +99,9 @@
             <div class="slide-group slide-group-sale">
               <v-sheet class="mx-auto" elevation="8" max-width="100%">
                 <v-slide-group v-model="model" class="pa-4" center-active show-arrows>
-                  <v-slide-group-item v-for="(products, i) in data" :key="i" v-slot="{ isSelected, toggle }">
+                  <v-slide-group-item v-for="(products, i) in topSellerProducts" :key="i" v-slot="{ isSelected, toggle }">
                     <v-card class="ma-4" width="218">
-                      <ProductCardVue :url="products.product_variants[0].images[0].image_path" :name="products.name"
+                      <ProductCardVue :url="products.product_variants[0]?.images[0].image_path" :name="products.name"
                         :brand="products.brand.name" :price="products.product_variants[0]?.price" :id="products.id">
                       </ProductCardVue>
                     </v-card>
@@ -128,11 +128,24 @@
             <img src="https://theme.hstatic.net/200000516791/1000880762/14/home_tabs_1_banner.jpg?v=2258" alt="">
           </div>
           <div class="new-product-right">
-            <div class="new-product-cart" v-for="(products, i) in data" :key="i">
-              <ProductCardVue :url="products.product_variants[0].images[0].image_path" :name="products.name"
+            <div class="new-product-cart" v-for="(products, i) in newCollectionProducts" :key="i">
+              <ProductCardVue :url="products.product_variants[0]?.images[0].image_path" :name="products.name"
                 :brand="products.brand.name" :price="products.product_variants[0]?.price" :id="products.id">
               </ProductCardVue>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- --------------------------------------------------------------- -->
+
+      <div class="hight-end-box">
+        <h2>Sản phẩm cao cấp</h2>
+        <div class="product-hight-end">
+          <div class="hight-end-cart" v-for="(products, i) in highEndProducts" :key="i">
+            <ProductCardVue :url="products.product_variants[0]?.images[0].image_path" :name="products.name"
+              :brand="products.brand.name" :price="products.product_variants[0]?.price" :id="products.id">
+            </ProductCardVue>
           </div>
         </div>
       </div>
@@ -179,7 +192,6 @@ export default {
         "https://theme.hstatic.net/200000516791/1000880762/14/categorybanner_4_img.jpg?v=2257",
       ],
       model: null,
-      data: [],
       countDownToTime: new Date("Apr 22, 2023 00:00:00").getTime(),
       timeDays: null,
       timesHours: null,
@@ -193,7 +205,11 @@ export default {
   },
 
   computed: {
-    ...mapState(useProductsStore, ['allProducts', 'allCategory', 'params']),
+    ...mapState(useProductsStore, [
+      'allProducts', 'allCategory', 'params',
+      'promotionProducts', 'topSellerProducts', 'newCollectionProducts',
+      'highEndProducts',
+    ]),
   },
 
   methods: {
@@ -254,9 +270,26 @@ export default {
       this.params.skip = this.pageCategory
       this.params.limit = this.sizeCategory
       await this.getCategorys(this.params)
-      // console.log('category', this.allCategory)
-      const res = await this.allProducts
-      this.data = res
+
+      //top sản phẩm khuyến mại
+      this.params.skip = this.pageProduct
+      this.params.limit = this.sizeProduct
+      await this.getPromotionProducts(this.params)
+
+      // sản phẩm bán chạy
+      this.params.skip = this.pageProduct
+      this.params.limit = this.sizeProduct
+      await this.getTopSellerProducts(this.params)
+
+      // sản phẩm mới
+      this.params.skip = this.pageProduct
+      this.params.limit = this.sizeProduct
+      await this.getNewCollectionProducts(this.params)
+
+      // sản phẩm cao cấp
+      this.params.skip = this.pageProduct
+      this.params.limit = this.sizeProduct
+      await this.getHighEndProducts(this.params)
     } catch (error) {
       console.log(error);
     }
@@ -269,6 +302,7 @@ export default {
 </script>
 
 <style scoped>
+/* /// */
 .home-header {
   position: relative;
 }
@@ -677,6 +711,25 @@ export default {
   padding: 0 8px 12px 8px;
 }
 
+.product-hight-end {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.hight-end-cart {
+  width: 20%;
+  padding: 20px;
+}
+
+.hight-end-box {
+  margin: 12px 32px 0 44px;
+}
+
+.hight-end-box h2 {
+  margin-left: 10px;
+  padding: 12px;
+}
 
 
 @keyframes animate {

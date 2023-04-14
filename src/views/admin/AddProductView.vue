@@ -52,6 +52,16 @@
 import { mapActions, mapState } from 'pinia'
 import { useProductsStore } from '@/stores/products'
 export default {
+    props: {
+        page: {
+            type: Number,
+            required: true,
+        },
+        size: {
+            type: Number,
+            required: true,
+        }
+    },
     data() {
         return {
             dialog: false,
@@ -61,9 +71,6 @@ export default {
                 brand_id: '',
                 description: '',
             },
-            page: 1,
-            size: 10,
-
         }
     },
     methods: {
@@ -86,11 +93,11 @@ export default {
                 this.createProduct.brand_id = ''
                 this.createProduct.description = ''
                 this.dialog = false;
-                console.log('name', data);
+                // console.log('name', data);
             } catch (error) {
                 console.log(error);
             }
-        }
+        },
     },
     computed: {
         ...mapState(useProductsStore, [
@@ -104,6 +111,7 @@ export default {
     async created() {
         try {
             await this.getBrand()
+            await this.getCategorys()
             console.log('created', this.allBrand);
         } catch (error) {
 

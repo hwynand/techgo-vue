@@ -69,8 +69,9 @@ export default {
                     })
                     this.passwordNew = ''
                     data.password = ''
+                    this.oldPassword = ''
                 } else {
-                    Swal.fire('Mật khẩu không khớp')
+                    Swal.fire('Mật khẩu mới không khớp')
                 }
 
             } catch (error) {

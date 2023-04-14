@@ -218,11 +218,9 @@ export default {
       'getCategorys',
     ]),
 
-    ...mapActions(useCartStore, ['getCarts']),
-
-    reload() {
-      location.reload();
-    },
+    ...mapActions(useCartStore, [
+      'getCarts'
+    ]),
 
     async onSearch() {
       console.log('search', this.params)
@@ -259,9 +257,14 @@ export default {
       this.showSearches = false;
     },
 
+    reload() {
+      location.reload();
+    },
+
     handleLogOut() {
       this.logout()
       this.reload()
+      // this.$router.push({ path: '/' })
     },
 
     onClickOutside() {

@@ -21,7 +21,7 @@
                             </div>
                         </div>
                         <div class="product-sale">
-                            <p>-16%</p>
+                            <p>10%</p>
                             <p>OFF</p>
                         </div>
                     </div>
@@ -33,13 +33,13 @@
                             <div class="product-center">
                                 <span>Tình trạng:
                                     <span
-                                        :class="[detailProduct.product_variants[currentIndex]?.inventory > 0 ? 'statusGold' : 'statusRed']">
-                                        {{ detailProduct.product_variants[currentIndex]?.inventory > 0 ? 'Còn Hàng' :
+                                        :class="[detailProduct.product_variants?.[currentIndex]?.inventory > 0 ? 'statusGold' : 'statusRed']">
+                                        {{ detailProduct.product_variants?.[currentIndex]?.inventory > 0 ? 'Còn Hàng' :
                                             'Hết Hàng'
                                         }}
                                     </span>
                                 </span>
-                                <span>Thương Hiệu: <span class="Trademark">{{ detailProduct.brand.name }}</span></span>
+                                <span>Thương Hiệu: <span class="Trademark">{{ detailProduct.brand?.name }}</span></span>
                             </div>
                             <div class="product-price">
                                 <span class="span-price">Giá:</span>
@@ -47,16 +47,19 @@
                                 <!-- <span style="text-decoration: line-through;">{{ formatOldPrice() }}</span> -->
                                 <!-- <span class="span-sale">- {{ (data.sale) * 100 }}%</span> -->
                             </div>
-                            <div class="product-color">
+                            <div class="product-color" v-if="detailProduct.category?.name !== 'tivi'">
                                 <p>Màu sắc: </p>
-                                <p class="product-color-Gold" v-for="(items, i) in detailProduct.product_variants" :key="i"
+                                <p class="product-color-detail" :style="{ backgroundColor: items.color }"
+                                    v-for=" (items, i) in detailProduct.product_variants" :key="i"
                                     @click="clickColor(items, i)">
                                 </p>
-                                <!-- <p class="product-color-gray"></p>
-                  <p class="product-color-black"></p>
-                  <p class="product-color-Gold"></p>
-                  <p class="product-color-moss_green"></p>
-                  <p class="product-color-violet"></p> -->
+                            </div>
+                            <div class="product-color no-color" v-else>
+                                <p>Màu sắc: {{ detailProduct.category?.id }} </p>
+                                <p class="product-color-detail" :style="{ backgroundColor: items.color }"
+                                    v-for=" (items, i) in detailProduct.product_variants" :key="i"
+                                    @click="clickColor(items, i)">
+                                </p>
                             </div>
                             <div class="product-number">
                                 <p style="width:15%">Số Lượng:</p>
@@ -155,20 +158,7 @@
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn btn-primary" id="liveToastBtn" @click="showToast()">Show live toast</button>
         </div>
-        <div class="toast-container position-fixed top-0 end-0 p-3">
-            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <strong class="me-auto">Bootstrap</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    Hello, world! This is a toast message.
-                </div>
-            </div>
-        </div>
-
         <vue-easy-lightbox :scrollDisabled="scrollDisabled" :escDisabled="escDisabled" :visible="visible" :imgs="imgs"
             :index="index" @hide="handleHide">
         </vue-easy-lightbox>
@@ -216,28 +206,116 @@ export default {
                 ],
                 description_detail: "<div class=\"description-productdetail\">\n\t\t\t\t\t\t\t\t<p><strong>Đặc điểm nổi bật</strong></p><ul><li><p>Tivi NanoCell LG 4K (3840 x 2160) hiển thị hình ảnh sắc nét, chi tiết</p></li><li><p>Công nghệ NanoCell giúp hình ảnh có màu sắc thuần khiết và tinh tế hơn</p></li><li><p>Bộ xử lý α7 Gen4 Processor 4K phân tích và tối ưu hóa nội dung hiển thị</p></li><li><p>FILMMAKER MODE™ truyền tải phim chân thực như dưới góc nhìn đạo diễn</p></li><li><p>Công nghệ Dolby Atmos mang đến không gian âm thanh vòm sống động</p></li><li><p>Công nghệ AI Sound tinh chỉnh âm thanh dựa trên thể loại nội dung đang xem</p></li><li><p>Tivi LG hỗ trợ tìm kiếm bằng giọng nói giúp tìm kiếm nội dung tiện lợi hơn</p></li></ul><div> </div><h2>Thông số sản phẩm</h2><table id=\"tblGeneralAttribute\" border=\"1\" cellspacing=\"0\" style=\"background-color:#ffffff; border-collapse:collapse; border-spacing:0px; border:1px solid #eeeeee; box-sizing:border-box; color:#333333; font-family:Roboto,sans-serif; font-size:13px; line-height:20px; margin-bottom:20px; max-width:100%; min-width:500px; width:100%\" class=\"mce-item-table table table-bordered\"><tbody style=\"box-sizing: border-box;\"><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Model</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\"><table><tbody><tr><td><table><tbody><tr><td>50NANO86TPA</td></tr></tbody></table></td></tr></tbody></table></td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\"><table><tbody><tr><td>Nhà sản xuất</td></tr></tbody></table></td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">LG</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\"><table><tbody><tr><td>Xuất xứ</td></tr></tbody></table></td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">Indonesia</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Năm ra mắt</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">2021</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Thời gian bảo hành</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">24 tháng</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Loại Tivi</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">Tivi NanoCell</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Kích thước màn hình</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">50 inch</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Độ phân giải</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">4K (3840 x 2160) Pixels</td></tr><tr style=\"box-sizing:border-box\" class=\"row-info\"><td style=\"background-color:#f7f7f7 !important; border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:22.7596%\">Công nghệ xử lí hình ảnh</td><td style=\"border-color:#eeeeee; border-style:solid; border-width:1px; box-sizing:border-box; padding:8px; vertical-align:top; width:77.0982%\">X1 4K Processor, Direct LED Frame Dimming, HLG, Motionflow XR 200, HDR10, Auto Mode, 4K X-Reality PRO</td></tr></tbody></table>\n\t\t\t\t\t\t\t</div>"
             },
-            useUsersStore: useUsersStore()
+            useUsersStore: useUsersStore(),
+            arr: [
+                {
+                    id: 54,
+                    product_variant: {
+                        id: 42,
+                        product_id: 1,
+                        name: "test1",
+                        color: "#e67e22",
+                        sku: "test",
+                        price: 120000,
+                        inventory: 12,
+                        images: [
+                            {
+                                id: 59,
+                                image_path:
+                                    "https://pxh09.cloud/files/32ba358554615180.jpg",
+                            },
+                        ],
+                    },
+                    qty: 1,
+                },
+                {
+                    id: 51,
+                    product_variant: {
+                        id: 24,
+                        product_id: 10,
+                        name: "oppo-plus-đen",
+                        color: "#000000",
+                        sku: "string",
+                        price: 19990000,
+                        inventory: 10,
+                        images: [
+                            {
+                                id: 26,
+                                image_path:
+                                    "https://cdn2.cellphones.com.vn/358x358,webp,q100/media/catalog/product/d/c/dcdcd_1_.jpg",
+                            },
+                        ],
+                    },
+                    qty: 2,
+                },
+                {
+                    id: 52,
+                    product_variant: {
+                        id: 24,
+                        product_id: 10,
+                        name: "oppo-plus-đen",
+                        color: "#000000",
+                        sku: "string",
+                        price: 19990000,
+                        inventory: 10,
+                        images: [
+                            {
+                                id: 26,
+                                image_path:
+                                    "https://cdn2.cellphones.com.vn/358x358,webp,q100/media/catalog/product/d/c/dcdcd_1_.jpg",
+                            },
+                        ],
+                    },
+                    qty: 3,
+                },
+            ],
+            arr1: [
+                {
+                    id: 54,
+                    product_variant: {
+                        id: 42,
+                        product_id: 1,
+                        name: "test1",
+                        color: "#e67e22",
+                        sku: "test",
+                        price: 120000,
+                        inventory: 12,
+                        images: [
+                            {
+                                id: 59,
+                                image_path:
+                                    "https://pxh09.cloud/files/32ba358554615180.jpg",
+                            },
+                        ],
+                    },
+                    qty: 1,
+                },
+            ],
         }
     },
 
 
     computed: {
-        ...mapState(useCartStore, ['cartValue']),
+        ...mapState(useCartStore, [
+            'cartValue',
+            'allCart',
+        ]),
         ...mapState(useProductsStore, [
             'params',
             'allProducts',
             'detailProduct',
+            'allBrand'
         ]),
-
-
-        // getSelectedProduc() {
-        //   let index = this.currentIndex;
-        //   return this.detailProduct[index];
-        // },
+        commonItems() {
+            // Lấy ra các phần tử trùng nhau
+            return this.arr.filter((item) =>
+                this.arr1.some((item1) => item1.id === item.id)
+            );
+        },
 
         onDiscount() {
             let index = this.currentIndex;
-            let price = this.detailProduct.product_variants[index]?.price;
+            let price = this.detailProduct.product_variants?.[index]?.price;
             if (this.number == 1) {
                 return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(price);
             } else {
@@ -250,22 +328,13 @@ export default {
             let oldPrice = 1
             return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(oldPrice);
         },
-
-        // productColor() {
-        //   let index = this.currentIndex;
-        //   const nameColor = this.detailProduct.product_variants[index].name
-        //   if (nameColor === 'iphone14-promax-vàng') {
-        //     return 'product-color-Gold'
-        //   }
-        // }
-
-
     },
 
     methods: {
         ...mapActions(useProductsStore, [
             'getProducts',
             'getDetailProduct',
+            'getBrand',
         ]),
         ...mapActions(useUsersStore, ['checkLoggedIn']),
         ...mapActions(useCartStore, ['addCart']),
@@ -282,8 +351,8 @@ export default {
         },
 
         clickColor(items, i) {
-            console.log('items', items);
             this.currentIndex = i;
+            // console.log('items', items);
         },
 
 
@@ -292,20 +361,26 @@ export default {
                 let index = this.currentIndex;
                 let inventory = this.detailProduct.product_variants[index].inventory
 
-                // const checkAut = this.checkLoggedIn()
+                // checklogin trước khi thêm vào giỏ hàng
                 const isLoggedIn = localStorage.getItem('isLoggedIn')
                 const userData = localStorage.getItem('user')
                 if (!isLoggedIn && !userData) {
                     this.$router.push({ path: '/dang-nhap' })
                     console.log('checkAut', checkAut);
                 } else if (inventory > 0) {
-                    let val = this.detailProduct.product_variants[index].id
-                    this.cartValue.product_variant_id = val
+                    let id = this.detailProduct.product_variants[index].id
+                    this.cartValue.product_variant_id = id
                     this.cartValue.qty = this.number
-                    const res = await this.addCart(this.cartValue)
+                    await this.addCart(this.cartValue)
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Đã thêm sản phẩm vào giỏ hàng',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
                 } else {
                     Swal.fire('Sản phẩm hết hàng')
-
                 }
 
             } catch (error) {
@@ -380,6 +455,7 @@ export default {
     async created() {
         console.log('data_slug', this.allProducts);
         console.log('slug', this.slug);
+        console.log('allCart', this.allCart);
         try {
             const id = this.slug
             await this.getDetailProduct({ id })
@@ -387,10 +463,21 @@ export default {
             console.log(error);
         }
     },
+    // watch: {
+    //     overlay(val) {
+    //         val && setTimeout(() => {
+    //             this.overlay = false
+    //         }, 3000)
+    //     },
+    // },
 }
 </script>
   
 <style scoped>
+.no-color {
+    display: none !important;
+}
+
 .toast-container {
     margin-top: 38px;
 }
@@ -555,8 +642,8 @@ export default {
     margin-left: 12px;
 }
 
-.product-color-Gold {
-    background-color: #fffa65;
+.product-color-detail {
+    /* background-color: #fffa65; */
     width: 30px;
     height: 30px;
     border-radius: 50%;
@@ -755,16 +842,16 @@ export default {
     padding: 2px 0;
 }
 
-::v-deep(.description-productdetail li) {
+:deep(.description-productdetail li) {
     list-style: none;
     padding: 2px 0;
 }
 
-::v-deep(.description-productdetail ul) {
+:deep(.description-productdetail ul) {
     margin-top: 12px;
 }
 
-::v-deep(.description-productdetail h2) {
+:deep(.description-productdetail h2) {
     margin-bottom: 12px;
 }
 
@@ -786,11 +873,11 @@ export default {
     font-weight: 600;
 }
 
-::v-deep(.v-window--show-arrows-on-hover:hover) {
+:deep(.v-window--show-arrows-on-hover:hover) {
     cursor: url('https://file.hstatic.net/1000397797/file/cursor-zoom-in_67804ceaaa0941cf840b0ad13cde42ed.svg'), auto;
 }
 
-::v-deep(.header-left a) {
+:deep(.header-left a) {
     text-decoration: none;
     color: white;
 }

@@ -66,11 +66,11 @@
                                             <div class="product-color">
                                                 <div class="box-color">
                                                     <p>Màu sắc: </p>
-                                                    <p class="color-modal">đen</p>
                                                 </div>
                                                 <p class="product-color-Gold" :class="items.name"
+                                                    :style="{ backgroundColor: items.color }"
                                                     v-for="(items, i) in detailProduct.product_variants" :key="i"
-                                                    @click="clickColor(items, i)">
+                                                    @click="clickColor(i)">
                                                 </p>
                                                 <!-- <p class="product-color-gray"></p>
                                                 <p class="product-color-black"></p>
@@ -179,10 +179,6 @@ export default {
             console.log('click');
         },
 
-        handaleAddCart(id) {
-            console.log('add cart');
-        },
-
         handleClickProductDetailView(id) {
             this.$router.push({ path: `/san-pham/${id}` })
         },
@@ -194,8 +190,7 @@ export default {
             // console.log('id', id);
             this.getDetailProduct({ id })
         },
-        clickColor(items, i) {
-            // console.log('items', items);
+        clickColor(i) {
             this.currentIndex = i;
         },
         onClickPlus() {
@@ -228,7 +223,7 @@ export default {
                     this.cartValue.qty = this.number
                     const res = await this.addCart(this.cartValue)
                     this.dialog = false
-                    // this.reload()
+                    alert('Đã thêm sản phầm vào giỏ hàng')
                 } else {
                     alert('sản phẩm đã hết hàng')
 
@@ -740,12 +735,6 @@ export default {
 .box-color p {
     font-weight: 600;
     margin-right: 12px;
-}
-
-.color-modal {
-    font-size: 0.8rem;
-    color: #575fcf;
-    margin-left: 8px;
 }
 
 .product-center {

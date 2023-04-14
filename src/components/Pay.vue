@@ -88,7 +88,7 @@
             </div>
             <div class="sidebar">
                 <div class="sidebar-content">
-                    <div class="order-summary-sections" v-for="(oder, i) in allCart" :key="i">
+                    <div class="order-summary-sections" v-for="(oder, i) in groupedVariants" :key="i">
                         <div class="sidebar-content-img">
                             <img :src="oder.product_variant.images[0].image_path" alt="">
                             <p class="pay-name">{{ oder.product_variant.name }}</p>
@@ -195,6 +195,18 @@ export default {
             });
             return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'VND' }).format(totalPrice);
         },
+        groupedVariants() {
+            const grouped = {};
+            this.allCart.forEach(variant => {
+                const key = variant.product_variant.id;
+                if (!grouped[key]) {
+                    grouped[key] = { ...variant };
+                } else {
+                    grouped[key].qty += variant.qty;
+                }
+            });
+            return Object.values(grouped);
+        }
     },
 
     created() {

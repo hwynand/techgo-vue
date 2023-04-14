@@ -7,5 +7,5 @@ export default {
 </script>
 
 <template>
-    <register-form />
+    <RegisterForm />
 </template>

@@ -171,10 +171,9 @@ export default {
             try {
                 const data = this.dataUpdateUser
                 delete data.email
-                const res = await this.updateProfile({ data })
-                if (res.status === 200) {
-                    this.getProfile()
-                }
+                await this.updateProfile({ data })
+                this.getProfile()
+
             } catch (error) {
                 console.log(error);
             }
@@ -203,7 +202,6 @@ export default {
             this.valDetailOder = item
             this.showDetailOrder = true
             console.log('item', item);
-
         }
     },
     computed: {

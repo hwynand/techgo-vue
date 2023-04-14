@@ -54,7 +54,7 @@ const router = createRouter({
     },
     {
       path: '/thong-tin',
-      name: 'register',
+      name: 'info',
       component: () => import('../views/users/InForUserView.vue')
     },
     {

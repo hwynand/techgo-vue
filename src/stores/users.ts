@@ -70,6 +70,7 @@ export const useUsersStore = defineStore('users', {
       this.auth.isLoggedIn = false
       localStorage.removeItem('user')
       localStorage.removeItem('isLoggedIn')
+      // localStorage.removeItem('access-token')
     },
     async getUsers({ skip }, { limit }) {
       try {

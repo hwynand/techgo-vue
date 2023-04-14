@@ -363,7 +363,7 @@
     "@vue/server-renderer" "3.2.47"
     "@vue/shared" "3.2.47"
 
-"vuetify@3.1.10":
-  "integrity" "sha512-TFugKhjYO+xktnexHcs/vdsqtq+MZk8MDLbSJX9vMsA58LPwO4atdBbWhQ1Pf8q1jPISpxDF6njjsZHPQQsHCA=="
-  "resolved" "https://registry.npmjs.org/vuetify/-/vuetify-3.1.10.tgz"
-  "version" "3.1.10"
+"vuetify@3.1.14":
+  "integrity" "sha512-KpJH7CDyDwLjfLUkKgmijZ7WMBscuGTGKeO5pomerEWQiZ9X9bjHJTXdycqFX60QSl3AkrJeSIWW/l8nkxoslw=="
+  "resolved" "https://registry.npmjs.org/vuetify/-/vuetify-3.1.14.tgz"
+  "version" "3.1.14"
